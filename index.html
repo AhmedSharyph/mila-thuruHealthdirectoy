@@ -19,41 +19,51 @@
 <body class="h-screen m-0 p-0 font-sans bg-gray-50">
 
   <!-- Navbar -->
-  <nav class="fixed top-0 left-0 right-0 bg-white shadow z-50">
-    <div class="max-w-7xl mx-auto flex items-center justify-between px-4 py-3">
+ <!-- Navbar -->
+<nav class="fixed top-0 left-0 right-0 bg-white shadow z-50">
+  <div class="max-w-7xl mx-auto flex items-center justify-between px-4 py-3 relative">
 
-      <!-- Logo + Title -->
-      <a href="index.html" class="flex items-center gap-2">
-        <img src="./logo.png" alt="Logo" class="w-8 h-8">
-        <span class="hidden lg:inline font-semibold text-emerald-900">Shaviyani Health Directory</span>
-      </a>
+    <!-- Logo + Title -->
+    <a href="index.html" class="flex items-center gap-2">
+      <img src="./logo.png" alt="Logo" class="w-8 h-8">
+      <span class="hidden lg:inline font-semibold text-emerald-900">Shaviyani Health Directory</span>
+    </a>
 
-      <!-- Search Form (hidden on small screens) -->
-<!-- Search Form (visible on all screens) -->
-<form id="searchForm" class="flex flex-grow mx-2 md:mx-4" role="search" onsubmit="return false;">
-  <input
-    id="searchInput"
-    type="search"
-    placeholder="🔍 Search by any field..."
-    autocomplete="off"
-    aria-label="Search directory"
-    class="w-full border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600"
-  />
-</form>
+    <!-- Search Form -->
+    <form id="searchForm" class="flex flex-grow mx-2 md:mx-4" role="search" onsubmit="return false;">
+      <input
+        id="searchInput"
+        type="search"
+        placeholder="🔍 Search by any field..."
+        autocomplete="off"
+        aria-label="Search directory"
+        class="w-full border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600"
+      />
+    </form>
 
+    <!-- Hamburger (mobile) -->
+    <button id="hamburgerBtn" class="text-2xl lg:hidden" aria-label="Toggle navigation" aria-expanded="false">
+      &#9776;
+    </button>
 
-      <!-- Hamburger (mobile) -->
-      <button id="hamburgerBtn" class="text-2xl lg:hidden" aria-label="Toggle navigation" aria-expanded="false">
-        &#9776;
-      </button>
-
-      <!-- Navigation Links -->
-      <div id="navbarNav" class="hidden lg:flex lg:items-center lg:space-x-4">
-        <a href="add-contact.html" class="block px-4 py-2 text-sm font-medium hover:text-emerald-700">Add Contact</a>
-      </div>
-
+    <!-- Navigation Links -->
+    <div id="navbarNav" class="hidden absolute top-full right-4 mt-1 bg-white rounded-lg shadow-lg w-48 lg:static lg:flex lg:items-center lg:space-x-4">
+      <a href="add-contact.html" class="block px-4 py-2 text-sm font-medium hover:text-emerald-700">Add Contact</a>
     </div>
-  </nav>
+
+  </div>
+</nav>
+
+<script>
+  const hamburgerBtn = document.getElementById('hamburgerBtn');
+  const navbarNav = document.getElementById('navbarNav');
+
+  hamburgerBtn.addEventListener('click', () => {
+    const expanded = hamburgerBtn.getAttribute('aria-expanded') === 'true';
+    hamburgerBtn.setAttribute('aria-expanded', !expanded);
+    navbarNav.classList.toggle('hidden');
+  });
+</script>
 
   <!-- Main Content -->
 <main class="max-w-7xl mx-auto mt-20 px-4" id="directoryContainer">
@@ -62,18 +72,6 @@
 </p>
 </main>
 
-
-  <!-- Hamburger Script -->
-  <script>
-    const hamburgerBtn = document.getElementById('hamburgerBtn');
-    const navbarNav = document.getElementById('navbarNav');
-
-    hamburgerBtn.addEventListener('click', () => {
-      const expanded = hamburgerBtn.getAttribute('aria-expanded') === 'true';
-      hamburgerBtn.setAttribute('aria-expanded', !expanded);
-      navbarNav.classList.toggle('hidden');
-    });
-  </script>
  <script>
 const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwndImcPMsQCTx1xLtxolE7Q7nOdN_nVpmOh7fw0U0Sy0-0u30Chp6ovUVhJgk2XdRuNg/exec';
 
