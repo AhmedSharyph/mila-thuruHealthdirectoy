@@ -1,6 +1,6 @@
 {
   "name": "shaviyanihealthdirectory",
-  "short_name": "shaviyanihealthdirectory",
+  "short_name": "shdir",
   "description": "Find any house address in Sh. Funadhoo with pinpoint accuracy using shaviyanihealthdirectory.",
   "start_url": "/shaviyanihealthdirectory/index.html",
   "display": "standalone",
