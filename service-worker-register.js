@@ -1,5 +1,7 @@
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('service-worker.js')
+  const swPath = `${window.location.pathname.replace(/\/[^\/]*$/, '')}/service-worker.js`;
+
+  navigator.serviceWorker.register(swPath)
     .then(function(registration) {
       showMessage(`✅ Service Worker registered with scope: ${registration.scope}`, 'success');
     })
