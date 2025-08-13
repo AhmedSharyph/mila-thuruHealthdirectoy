@@ -24,23 +24,52 @@
 </head>
 <body class="bg-gray-100 text-gray-800 pt-[56px]">
 
-  <!-- Navbar -->
-  <nav class="fixed top-0 left-0 right-0 bg-white shadow z-50">
-    <div class="flex items-center gap-4 px-2 md:px-4 py-2 w-full">
-      <a href="index.html" class="flex items-center whitespace-nowrap">
-        <img src="./logo.png" alt="Logo" class="w-7 h-7 mr-2" />
-        <span class="font-semibold text-emerald-900">Shaviyani Health Directory</span>
-      </a>
-      <button id="hamburgerBtn" class="text-xl lg:hidden ml-auto" aria-label="Toggle navigation" aria-expanded="false" aria-controls="navbarNav">
-        &#9776;
-      </button>
-      <div id="navbarNav" class="absolute lg:static top-full right-0 bg-white shadow-lg rounded hidden lg:flex flex-col lg:flex-row lg:shadow-none lg:bg-transparent ml-auto">
-        <ul class="flex flex-col lg:flex-row items-end lg:items-center">
-          <li><a href="https://ahmedsharyph.github.io/shaviyanihealthdirectory/" class="block px-4 py-2 text-sm font-medium hover:text-emerald-700">Home</a></li>
-        </ul>
-      </div>
+<!-- Navbar -->
+<nav class="fixed top-0 left-0 right-0 bg-white shadow z-50">
+  <div class="max-w-7xl mx-auto flex items-center justify-between px-4 py-3">
+
+    <!-- Logo + Title -->
+    <a href="index.html" class="flex items-center gap-2">
+      <img src="./logo.png" alt="Logo" class="w-8 h-8">
+      <span class="hidden lg:inline font-semibold text-emerald-900">Shaviyani Health Directory</span>
+    </a>
+
+    <!-- Search Form (visible on all screens) -->
+    <!--<form id="searchForm" class="flex flex-grow mx-2 md:mx-4" role="search" onsubmit="return false;">
+      <input
+        id="searchInput"
+        type="search"
+        placeholder="🔍 Search by any field..."
+        autocomplete="off"
+        aria-label="Search directory"
+        class="w-full border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600"
+      />
+    </form>-->
+
+    <!-- Hamburger (mobile) -->
+    <button id="hamburgerBtn" class="text-2xl lg:hidden" aria-label="Toggle navigation" aria-expanded="false">
+      &#9776;
+    </button>
+
+    <!-- Navigation Links -->
+    <div id="navbarNav" class="hidden lg:flex lg:items-center lg:space-x-4">
+      <a href="add-contact.html" class="block px-4 py-2 text-sm font-medium hover:text-emerald-700">Add Contact</a>
     </div>
-  </nav>
+
+  </div>
+</nav>
+
+<!-- Hamburger Script -->
+<script>
+  const hamburgerBtn = document.getElementById('hamburgerBtn');
+  const navbarNav = document.getElementById('navbarNav');
+
+  hamburgerBtn.addEventListener('click', () => {
+    const expanded = hamburgerBtn.getAttribute('aria-expanded') === 'true';
+    hamburgerBtn.setAttribute('aria-expanded', !expanded);
+    navbarNav.classList.toggle('hidden');
+  });
+</script>
 
   <!-- Main Content -->
   <main class="max-w-3xl mx-auto py-6 px-4">
