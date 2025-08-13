@@ -74,174 +74,201 @@
       navbarNav.classList.toggle('hidden');
     });
   </script>
+ <script>
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwndImcPMsQCTx1xLtxolE7Q7nOdN_nVpmOh7fw0U0Sy0-0u30Chp6ovUVhJgk2XdRuNg/exec';
 
-  <script>
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwndImcPMsQCTx1xLtxolE7Q7nOdN_nVpmOh7fw0U0Sy0-0u30Chp6ovUVhJgk2XdRuNg/exec';
+// Custom order of Health Centers
+const customOrder = [
+  "Shaviyani Atoll Hospital",
+  "Kanditheemu Health Centre",
+  "Noomaraa Health Centre",
+  "Goidhoo Health Centre",
+  "Feydhoo Health Centre",
+  "Feevaku Health Centre",
+  "Bilehfahi Health Centre",
+  "Foakaidhoo Health Centre",
+  "Narudhoo Health Centre",
+  "Maroshi Health Centre",
+  "Lhaimagu Health Centre",
+  "Komandoo Health Centre",
+  "Maaungoodhoo Health Centre",
+  "Milandhoo Health Centre"
+];
 
-    function normalize(str) {
-      return (str || '').toString().toLowerCase().replace(/\s+/g, ' ').trim();
+function normalize(str) {
+  return (str || '').toString().toLowerCase().replace(/\s+/g, ' ').trim();
+}
+
+let allRows = [];
+
+// Load and render data
+async function loadData() {
+  const container = document.getElementById('directoryContainer');
+  try {
+    const res = await fetch(WEB_APP_URL);
+    if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+    const data = await res.json();
+
+    if (!Array.isArray(data) || data.length === 0) {
+      container.innerHTML = '<p class="no-results text-center text-gray-500">No data found.</p>';
+      return;
     }
 
-    let allRows = [];
+    container.innerHTML = '';
 
-    async function loadData() {
-      const container = document.getElementById('directoryContainer');
-      try {
-        const res = await fetch(WEB_APP_URL);
-        if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-
-        const data = await res.json();
-
-        if (!Array.isArray(data) || data.length === 0) {
-          container.innerHTML = '<p class="no-results">No data found.</p>';
-          return;
-        }
-
-        container.innerHTML = '';
-
-        const grouped = {};
-        data.forEach(item => {
-          const center = String(item['Health Center'] || 'Unknown').trim();
-          if (!grouped[center]) grouped[center] = [];
-          grouped[center].push(item);
-        });
-
-        for (const center in grouped) {
-          const section = document.createElement('section');
-          section.className = 'center-group';
-          section.dataset.center = center.toLowerCase();
-
-          const rowsHtml = grouped[center].map(person => {
-            const fullName = String(person['Assigned To'] || '').trim();
-            const role = String(person['Role  or Function'] || '').trim();
-            const dept = String(person['Department'] || '').trim();
-            const phoneRaw = person['Contact Number'] || '';
-            const phone = String(phoneRaw).trim();
-            const searchText = normalize(`${center} ${fullName} ${role} ${dept} ${phone}`);
-
-            return `
-              <tr class="data-row" data-search="${searchText}">
-                <td class="px-4 py-2"><a href="tel:${phone}" class="text-emerald-600">📞 ${phone}</a></td>
-                <td class="px-4 py-2">${dept}</td>
-                <td class="px-4 py-2">${fullName}</td>
-                <td class="px-4 py-2">${role}</td>
-              </tr>`;
-          }).join('');
-
-          section.innerHTML = `
-            <h2>${center}</h2>
-            <div class="overflow-x-auto bg-white rounded shadow mb-6">
-              <table class="min-w-full border-collapse sortable-table">
-                <thead class="bg-emerald-600 text-white">
-                  <tr>
-                    <th class="px-4 py-2" data-col="0">Phone <span class="sort-arrow"></span></th>
-                    <th class="px-4 py-2" data-col="1">Department <span class="sort-arrow"></span></th>
-                    <th class="px-4 py-2" data-col="2">Assignee <span class="sort-arrow"></span></th>
-                    <th class="px-4 py-2" data-col="3">Role <span class="sort-arrow"></span></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${rowsHtml}
-                </tbody>
-              </table>
-            </div>
-          `;
-
-          container.appendChild(section);
-        }
-
-        allRows = Array.from(document.querySelectorAll('.data-row'));
-        enableSorting();
-
-      } catch (error) {
-        container.innerHTML = `<p class="no-results">Failed to load data: ${error.message}</p>`;
-        console.error(error);
-      }
-    }
-
-    function filterData() {
-      const term = normalize(document.getElementById('searchInput').value);
-      if (!term) {
-        allRows.forEach(row => (row.style.display = ''));
-        document.querySelectorAll('section.center-group').forEach(s => (s.style.display = ''));
-        const msg = document.querySelector('.no-results-message');
-        if (msg) msg.remove();
-        return;
-      }
-
-      let anyVisible = false;
-
-      allRows.forEach(row => {
-        const match = row.dataset.search.includes(term);
-        row.style.display = match ? '' : 'none';
-        if (match) anyVisible = true;
-      });
-
-      document.querySelectorAll('section.center-group').forEach(section => {
-        const visibleRows = section.querySelectorAll('tbody tr:not([style*="display: none"])');
-        section.style.display = visibleRows.length ? '' : 'none';
-      });
-
-      const container = document.getElementById('directoryContainer');
-      if (!anyVisible && !document.querySelector('.no-results-message')) {
-        const msg = document.createElement('p');
-        msg.className = 'no-results no-results-message';
-        msg.textContent = 'No matching contacts found.';
-        container.appendChild(msg);
-      } else if (anyVisible) {
-        const msg = document.querySelector('.no-results-message');
-        if (msg) msg.remove();
-      }
-    }
-
-    function enableSorting() {
-      const tables = document.querySelectorAll('table.sortable-table');
-      tables.forEach(table => {
-        const headers = table.querySelectorAll('thead th');
-        headers.forEach(th => {
-          th.addEventListener('click', () => {
-            const colIndex = parseInt(th.getAttribute('data-col'));
-            const tbody = table.querySelector('tbody');
-            const rowsArray = Array.from(tbody.querySelectorAll('tr'));
-
-            let currentSort = th.getAttribute('data-sort') || 'none';
-            headers.forEach(h => {
-              if (h !== th) {
-                h.setAttribute('data-sort', 'none');
-                h.querySelector('.sort-arrow').textContent = '';
-              }
-            });
-
-            let newSort = (currentSort === 'none' || currentSort === 'desc') ? 'asc' : 'desc';
-            th.setAttribute('data-sort', newSort);
-            th.querySelector('.sort-arrow').textContent = newSort === 'asc' ? '▲' : '▼';
-
-            rowsArray.sort((a, b) => {
-              let aText = a.children[colIndex].textContent.trim().toLowerCase();
-              let bText = b.children[colIndex].textContent.trim().toLowerCase();
-              if (colIndex === 0) {
-                aText = aText.replace(/\D/g, '') || '0';
-                bText = bText.replace(/\D/g, '') || '0';
-                return newSort === 'asc' ? aText.localeCompare(bText, undefined, {numeric:true}) : bText.localeCompare(aText, undefined, {numeric:true});
-              }
-              if (aText < bText) return newSort === 'asc' ? -1 : 1;
-              if (aText > bText) return newSort === 'asc' ? 1 : -1;
-              return 0;
-            });
-
-            rowsArray.forEach(row => tbody.appendChild(row));
-          });
-        });
-      });
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('searchInput').addEventListener('input', filterData);
+    // Group by Health Center
+    const grouped = {};
+    data.forEach(item => {
+      const center = String(item['Health Center'] || 'Unknown').trim();
+      if (!grouped[center]) grouped[center] = [];
+      grouped[center].push(item);
     });
 
-    window.onload = loadData;
-  </script>
+    // Sort centers by custom order
+    const groupedCenters = Object.keys(grouped).sort((a, b) => {
+      const indexA = customOrder.indexOf(a);
+      const indexB = customOrder.indexOf(b);
+      return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
+    });
 
+    // Render each center
+    for (const center of groupedCenters) {
+      const section = document.createElement('section');
+      section.className = 'center-group mb-6';
+      section.dataset.center = center.toLowerCase();
+
+      const rowsHtml = grouped[center].map(person => {
+        const fullName = String(person['Assigned To'] || '').trim();
+        const role = String(person['Role  or Function'] || '').trim();
+        const dept = String(person['Department'] || '').trim();
+        const phoneRaw = person['Contact Number'] || '';
+        const phone = String(phoneRaw).trim();
+        const searchText = normalize(`${center} ${fullName} ${role} ${dept} ${phone}`);
+
+        return `
+          <tr class="data-row" data-search="${searchText}">
+            <td class="px-4 py-2"><a href="tel:${phone}" class="text-emerald-600">📞 ${phone}</a></td>
+            <td class="px-4 py-2">${dept}</td>
+            <td class="px-4 py-2">${fullName}</td>
+            <td class="px-4 py-2">${role}</td>
+          </tr>`;
+      }).join('');
+
+      section.innerHTML = `
+        <h2 class="text-lg font-semibold mb-2">${center}</h2>
+        <div class="overflow-x-auto bg-white rounded shadow">
+          <table class="min-w-full border-collapse sortable-table">
+            <thead class="bg-emerald-600 text-white">
+              <tr>
+                <th class="px-4 py-2" data-col="0">Phone <span class="sort-arrow"></span></th>
+                <th class="px-4 py-2" data-col="1">Department <span class="sort-arrow"></span></th>
+                <th class="px-4 py-2" data-col="2">Assignee <span class="sort-arrow"></span></th>
+                <th class="px-4 py-2" data-col="3">Role <span class="sort-arrow"></span></th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHtml}
+            </tbody>
+          </table>
+        </div>
+      `;
+
+      container.appendChild(section);
+    }
+
+    allRows = Array.from(document.querySelectorAll('.data-row'));
+    enableSorting();
+
+  } catch (error) {
+    container.innerHTML = `<p class="no-results text-center text-red-500">Failed to load data: ${error.message}</p>`;
+    console.error(error);
+  }
+}
+
+// Search filtering
+function filterData() {
+  const term = normalize(document.getElementById('searchInput').value);
+  if (!term) {
+    allRows.forEach(row => (row.style.display = ''));
+    document.querySelectorAll('section.center-group').forEach(s => (s.style.display = ''));
+    const msg = document.querySelector('.no-results-message');
+    if (msg) msg.remove();
+    return;
+  }
+
+  let anyVisible = false;
+
+  allRows.forEach(row => {
+    const match = row.dataset.search.includes(term);
+    row.style.display = match ? '' : 'none';
+    if (match) anyVisible = true;
+  });
+
+  document.querySelectorAll('section.center-group').forEach(section => {
+    const visibleRows = section.querySelectorAll('tbody tr:not([style*="display: none"])');
+    section.style.display = visibleRows.length ? '' : 'none';
+  });
+
+  const container = document.getElementById('directoryContainer');
+  if (!anyVisible && !document.querySelector('.no-results-message')) {
+    const msg = document.createElement('p');
+    msg.className = 'no-results no-results-message text-center text-gray-500';
+    msg.textContent = 'No matching contacts found.';
+    container.appendChild(msg);
+  } else if (anyVisible) {
+    const msg = document.querySelector('.no-results-message');
+    if (msg) msg.remove();
+  }
+}
+
+// Enable sorting on table headers
+function enableSorting() {
+  const tables = document.querySelectorAll('table.sortable-table');
+  tables.forEach(table => {
+    const headers = table.querySelectorAll('thead th');
+    headers.forEach(th => {
+      th.addEventListener('click', () => {
+        const colIndex = parseInt(th.getAttribute('data-col'));
+        const tbody = table.querySelector('tbody');
+        const rowsArray = Array.from(tbody.querySelectorAll('tr'));
+
+        let currentSort = th.getAttribute('data-sort') || 'none';
+        headers.forEach(h => {
+          if (h !== th) {
+            h.setAttribute('data-sort', 'none');
+            h.querySelector('.sort-arrow').textContent = '';
+          }
+        });
+
+        let newSort = (currentSort === 'none' || currentSort === 'desc') ? 'asc' : 'desc';
+        th.setAttribute('data-sort', newSort);
+        th.querySelector('.sort-arrow').textContent = newSort === 'asc' ? '▲' : '▼';
+
+        rowsArray.sort((a, b) => {
+          let aText = a.children[colIndex].textContent.trim().toLowerCase();
+          let bText = b.children[colIndex].textContent.trim().toLowerCase();
+          if (colIndex === 0) { // Phone numeric sort
+            aText = aText.replace(/\D/g, '') || '0';
+            bText = bText.replace(/\D/g, '') || '0';
+            return newSort === 'asc'
+              ? aText.localeCompare(bText, undefined, {numeric:true})
+              : bText.localeCompare(aText, undefined, {numeric:true});
+          }
+          return newSort === 'asc' ? aText.localeCompare(bText) : bText.localeCompare(aText);
+        });
+
+        rowsArray.forEach(row => tbody.appendChild(row));
+      });
+    });
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('searchInput').addEventListener('input', filterData);
+});
+
+window.onload = loadData;
+</script>
 
   <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAOVYRIgupAurZup5y1PRh8Ismb1A3lLao&callback=initMap">
