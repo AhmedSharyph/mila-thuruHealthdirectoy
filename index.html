@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <meta name="description" content="shaviyanihealthdirectory">
+  <meta name="description" content="Find any house address in Sh. Funadhoo with pinpoint accuracy.">
 
   <!-- PWA Meta -->
-  <link rel="manifest" href="https://ahmedsharyph.github.io/shaviyanihealthdirectory/manifest.json">
+  <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#00bcd4">
-  <link rel="apple-touch-icon" href="https://ahmedsharyph.github.io/shaviyanihealthdirectory/logo.png">
+  <link rel="apple-touch-icon" href="./logo.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="shaviyanihealthdirectory">
+  <meta name="apple-mobile-web-app-title" content="Shaviyani Health Directory">
 
   <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -30,7 +30,7 @@
     <div class="max-w-7xl mx-auto flex items-center justify-between px-4 py-3">
 
       <!-- Logo + Title -->
-      <a href="index.html" class="flex items-center gap-2">
+      <a href="./index.html" class="flex items-center gap-2">
         <img src="./logo.png" alt="Logo" class="w-8 h-8">
         <span class="hidden lg:inline font-semibold text-emerald-900">Shaviyani Health Directory</span>
       </a>
@@ -54,83 +54,69 @@
 
       <!-- Navigation Links -->
       <div id="navbarNav" class="hidden lg:flex lg:items-center lg:space-x-4">
-        <a href="add-contact.html" class="block px-4 py-2 text-sm font-medium hover:text-emerald-700">Add Contact</a>
+        <a href="./add-contact.html" class="block px-4 py-2 text-sm font-medium hover:text-emerald-700">Add Contact</a>
       </div>
 
     </div>
   </nav>
 
+  <!-- Main Directory -->
   <main class="max-w-7xl mx-auto mt-4 px-4" id="directoryContainer">
     <p class="no-results">Loading data…</p>
   </main>
 
+  <!-- Footer -->
+  <footer class="bg-white shadow-inner mt-8 py-4 text-center text-sm text-gray-600">
+    <p>
+      &copy; <span id="footerYear"></span> Shaviyani Health Directory. 
+      Developed by 
+      <a href="https://www.ahmedshareef.mv/" target="_blank" rel="noopener noreferrer" class="text-emerald-600 hover:underline">
+        AhmedSharyph
+      </a>.
+    </p>
+  </footer>
+
   <script>
+    // Dynamic footer year
+    const currentYear = new Date().getFullYear();
+    document.getElementById('footerYear').textContent = currentYear > 2025 ? `2025 - ${currentYear}` : '2025';
+
     // Hamburger toggle
     const hamburgerBtn = document.getElementById('hamburgerBtn');
     const navbarNav = document.getElementById('navbarNav');
-
     hamburgerBtn.addEventListener('click', () => {
       const expanded = hamburgerBtn.getAttribute('aria-expanded') === 'true';
       hamburgerBtn.setAttribute('aria-expanded', !expanded);
       navbarNav.classList.toggle('hidden');
     });
-  </script>
-<!-- Footer -->
-<footer class="bg-white shadow-inner mt-8 py-4 text-center text-sm text-gray-600">
-  <p>
-    &copy; <span id="footerYear"></span> Shaviyani Health Directory. 
-    Developed by 
-    <a href="https://www.ahmedshareef.mv/" target="_blank" rel="noopener noreferrer" class="text-emerald-600 hover:underline">
-      AhmedSharyph
-    </a>.
-  </p>
-</footer>
 
-<script>
-  // Set dynamic year starting from 2025
-  const currentYear = new Date().getFullYear();
-  document.getElementById('footerYear').textContent = currentYear > 2025 ? `2025 - ${currentYear}` : '2025';
-</script>
-
-</body>
-</html>
-
-  <script>
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwndImcPMsQCTx1xLtxolE7Q7nOdN_nVpmOh7fw0U0Sy0-0u30Chp6ovUVhJgk2XdRuNg/exec';
-
+    // Search filtering
     function normalize(str) {
       return (str || '').toString().toLowerCase().replace(/\s+/g, ' ').trim();
     }
-
     let allRows = [];
-
     async function loadData() {
+      const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwndImcPMsQCTx1xLtxolE7Q7nOdN_nVpmOh7fw0U0Sy0-0u30Chp6ovUVhJgk2XdRuNg/exec';
       const container = document.getElementById('directoryContainer');
       try {
         const res = await fetch(WEB_APP_URL);
         if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-
         const data = await res.json();
-
         if (!Array.isArray(data) || data.length === 0) {
           container.innerHTML = '<p class="no-results">No data found.</p>';
           return;
         }
-
         container.innerHTML = '';
-
         const grouped = {};
         data.forEach(item => {
           const center = String(item['Health Center'] || 'Unknown').trim();
           if (!grouped[center]) grouped[center] = [];
           grouped[center].push(item);
         });
-
         for (const center in grouped) {
           const section = document.createElement('section');
           section.className = 'center-group';
           section.dataset.center = center.toLowerCase();
-
           const rowsHtml = grouped[center].map(person => {
             const fullName = String(person['Assigned To'] || '').trim();
             const role = String(person['Role  or Function'] || '').trim();
@@ -138,7 +124,6 @@
             const phoneRaw = person['Contact Number'] || '';
             const phone = String(phoneRaw).trim();
             const searchText = normalize(`${center} ${fullName} ${role} ${dept} ${phone}`);
-
             return `
               <tr class="data-row" data-search="${searchText}">
                 <td class="px-4 py-2"><a href="tel:${phone}" class="text-emerald-600">📞 ${phone}</a></td>
@@ -147,7 +132,6 @@
                 <td class="px-4 py-2">${role}</td>
               </tr>`;
           }).join('');
-
           section.innerHTML = `
             <h2>${center}</h2>
             <div class="overflow-x-auto bg-white rounded shadow mb-6">
@@ -160,25 +144,18 @@
                     <th class="px-4 py-2" data-col="3">Role <span class="sort-arrow"></span></th>
                   </tr>
                 </thead>
-                <tbody>
-                  ${rowsHtml}
-                </tbody>
+                <tbody>${rowsHtml}</tbody>
               </table>
-            </div>
-          `;
-
+            </div>`;
           container.appendChild(section);
         }
-
         allRows = Array.from(document.querySelectorAll('.data-row'));
         enableSorting();
-
       } catch (error) {
         container.innerHTML = `<p class="no-results">Failed to load data: ${error.message}</p>`;
         console.error(error);
       }
     }
-
     function filterData() {
       const term = normalize(document.getElementById('searchInput').value);
       if (!term) {
@@ -188,20 +165,16 @@
         if (msg) msg.remove();
         return;
       }
-
       let anyVisible = false;
-
       allRows.forEach(row => {
         const match = row.dataset.search.includes(term);
         row.style.display = match ? '' : 'none';
         if (match) anyVisible = true;
       });
-
       document.querySelectorAll('section.center-group').forEach(section => {
         const visibleRows = section.querySelectorAll('tbody tr:not([style*="display: none"])');
         section.style.display = visibleRows.length ? '' : 'none';
       });
-
       const container = document.getElementById('directoryContainer');
       if (!anyVisible && !document.querySelector('.no-results-message')) {
         const msg = document.createElement('p');
@@ -213,7 +186,6 @@
         if (msg) msg.remove();
       }
     }
-
     function enableSorting() {
       const tables = document.querySelectorAll('table.sortable-table');
       tables.forEach(table => {
@@ -223,7 +195,6 @@
             const colIndex = parseInt(th.getAttribute('data-col'));
             const tbody = table.querySelector('tbody');
             const rowsArray = Array.from(tbody.querySelectorAll('tr'));
-
             let currentSort = th.getAttribute('data-sort') || 'none';
             headers.forEach(h => {
               if (h !== th) {
@@ -231,38 +202,35 @@
                 h.querySelector('.sort-arrow').textContent = '';
               }
             });
-
             let newSort = (currentSort === 'none' || currentSort === 'desc') ? 'asc' : 'desc';
             th.setAttribute('data-sort', newSort);
             th.querySelector('.sort-arrow').textContent = newSort === 'asc' ? '▲' : '▼';
-
             rowsArray.sort((a, b) => {
               let aText = a.children[colIndex].textContent.trim().toLowerCase();
               let bText = b.children[colIndex].textContent.trim().toLowerCase();
               if (colIndex === 0) {
                 aText = aText.replace(/\D/g, '') || '0';
                 bText = bText.replace(/\D/g, '') || '0';
-                return newSort === 'asc' ? aText.localeCompare(bText, undefined, {numeric:true}) : bText.localeCompare(aText, undefined, {numeric:true});
+                return newSort === 'asc'
+                  ? aText.localeCompare(bText, undefined, {numeric:true})
+                  : bText.localeCompare(aText, undefined, {numeric:true});
               }
               if (aText < bText) return newSort === 'asc' ? -1 : 1;
               if (aText > bText) return newSort === 'asc' ? 1 : -1;
               return 0;
             });
-
             rowsArray.forEach(row => tbody.appendChild(row));
           });
         });
       });
     }
-
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('searchInput').addEventListener('input', filterData);
     });
-
     window.onload = loadData;
   </script>
 
-  <script src="https://ahmedsharyph.github.io/shaviyanihealthdirectory/install.js" defer></script>
-
+  <!-- PWA install prompt -->
+  <script src="./install.js" defer></script>
 </body>
 </html>
