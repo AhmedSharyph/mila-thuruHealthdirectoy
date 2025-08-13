@@ -29,16 +29,18 @@
       </a>
 
       <!-- Search Form (hidden on small screens) -->
-      <form id="searchForm" class="hidden md:flex flex-grow mx-4" role="search" onsubmit="return false;">
-        <input
-          id="searchInput"
-          type="search"
-          placeholder="🔍 Search by any field..."
-          autocomplete="off"
-          aria-label="Search directory"
-          class="w-full border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600"
-        />
-      </form>
+<!-- Search Form (visible on all screens) -->
+<form id="searchForm" class="flex flex-grow mx-2 md:mx-4" role="search" onsubmit="return false;">
+  <input
+    id="searchInput"
+    type="search"
+    placeholder="🔍 Search by any field..."
+    autocomplete="off"
+    aria-label="Search directory"
+    class="w-full border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600"
+  />
+</form>
+
 
       <!-- Hamburger (mobile) -->
       <button id="hamburgerBtn" class="text-2xl lg:hidden" aria-label="Toggle navigation" aria-expanded="false">
