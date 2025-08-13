@@ -4,14 +4,14 @@
   <meta charset="UTF-8" />
   <title>Shaviyani Health Directory - Add Contact</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
+  
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
-
+  
   <!-- Tom Select CSS -->
   <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet" />
-
+  
   <style>
     body {
       font-family: 'Roboto', sans-serif;
@@ -31,16 +31,12 @@
         <img src="./logo.png" alt="Logo" class="w-7 h-7 mr-2" />
         <span class="font-semibold text-emerald-900">Shaviyani Health Directory</span>
       </a>
-
       <button id="hamburgerBtn" class="text-xl lg:hidden ml-auto" aria-label="Toggle navigation" aria-expanded="false" aria-controls="navbarNav">
         &#9776;
       </button>
-
       <div id="navbarNav" class="absolute lg:static top-full right-0 bg-white shadow-lg rounded hidden lg:flex flex-col lg:flex-row lg:shadow-none lg:bg-transparent ml-auto">
         <ul class="flex flex-col lg:flex-row items-end lg:items-center">
-          <li>
-            <a href="https://ahmedsharyph.github.io/shaviyanihealthdirectory/" class="block px-4 py-2 text-sm font-medium hover:text-emerald-700">Home</a>
-          </li>
+          <li><a href="https://ahmedsharyph.github.io/shaviyanihealthdirectory/" class="block px-4 py-2 text-sm font-medium hover:text-emerald-700">Home</a></li>
         </ul>
       </div>
     </div>
@@ -61,7 +57,7 @@
             <select id="healthCenter" name="Health Center" required>
               <option value="" disabled selected>Select a Health Center</option>
               <option value="Shaviyani Atoll Hospital">Shaviyani Atoll Hospital</option>
-              <option value="Kandutheemu Health Center">Kanditheemu Health Center</option>
+              <option value="Kandutheemu Health Center">Kandutheemu Health Center</option>
               <option value="Noomaraa Health Center">Noomaraa Health Center</option>
               <option value="Goidhoo Health Center">Goidhoo Health Center</option>
               <option value="Feydhoo Health Center">Feydhoo Health Center</option>
@@ -92,13 +88,13 @@
           <!-- Assigned Staff -->
           <div>
             <label for="assignedTo" class="block mb-1 font-medium">Assigned Staff Name</label>
-            <input type="text" id="assignedTo" name="Role or Function" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-600" />
+            <input type="text" id="assignedTo" name="Assigned To" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-600" />
           </div>
 
           <!-- Role -->
           <div>
             <label for="role" class="block mb-1 font-medium">Role or Function</label>
-            <select id="role" name="Assigned To" required></select>
+            <select id="role" name="Role or Function" required></select>
           </div>
 
           <!-- Confirmation -->
@@ -113,6 +109,7 @@
               ✅ Submit
             </button>
           </div>
+
         </form>
       </div>
     </div>
@@ -122,7 +119,7 @@
   <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
 
   <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', () => {
       const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxI_5lWR-Bvk-FfqFgM2yp_tCgbGcUqxQY1kgPgAMb-7FdpyFTlfp3cvkBNoW2uTou77w/exec";
 
       const healthCenterSelect = document.getElementById('healthCenter');
@@ -133,81 +130,55 @@
       const form = document.getElementById('contactForm');
 
       // Initialize Tom Select
-      new TomSelect(healthCenterSelect, {
-        create: false,
-        placeholder: "Select a Health Center",
-        maxItems: 1,
-        sortField: false,
+      [healthCenterSelect, departmentSelect, roleSelect].forEach(select => {
+        new TomSelect(select, { create: false, maxItems: 1 });
       });
 
-      // Populate dropdowns
+      // Populate department and role
       fetch(WEB_APP_URL + "?action=getDropdownData")
-        .then(response => response.json())
+        .then(res => res.json())
         .then(data => {
-          function populateSelect(selectElem, options, placeholderText, allowCreate = true, sort = true) {
-            selectElem.innerHTML = '';
-            const defaultOption = new Option(placeholderText, "", true, true);
-            defaultOption.disabled = true;
-            selectElem.add(defaultOption);
-
-            if (sort) options.sort();
-
-            options.forEach(value => {
-              selectElem.add(new Option(value, value));
-            });
-
-            new TomSelect(selectElem, {
-              create: allowCreate,
-              placeholder: placeholderText,
-              maxItems: 1,
-              sortField: sort ? "text" : undefined,
-            });
-          }
-
-          populateSelect(departmentSelect, data.departments, "Select a Department");
-          populateSelect(roleSelect, data.roles, "Select a Role or Function");
+          const populate = (select, options, placeholder) => {
+            select.innerHTML = `<option value="" disabled selected>${placeholder}</option>`;
+            options.sort().forEach(opt => select.add(new Option(opt, opt)));
+          };
+          populate(departmentSelect, data.departments, "Select a Department");
+          populate(roleSelect, data.roles, "Select a Role or Function");
         })
-        .catch(err => {
-          console.error(err);
-          alert('Failed to load dropdown data. Please refresh the page.');
-        });
+        .catch(err => { console.error(err); alert('Failed to load dropdown data.'); });
 
-      // Enable submit on confirm
+      // Enable submit button on confirm
       confirmDataCheckbox.addEventListener('change', () => {
         submitBtn.disabled = !confirmDataCheckbox.checked;
       });
 
       // Form submission
-      const scriptURL = 'https://script.google.com/macros/s/AKfycbzL2KKwec0TU0r-WpsrVoSZykstA1v8Am4fvlQN6J-W8manlp32_JWG0UH41OsbQe3ZAA/exec';
       form.addEventListener('submit', e => {
         e.preventDefault();
         submitBtn.disabled = true;
-        submitBtn.innerHTML = '⏳ Submitting...';
-
+        submitBtn.textContent = '⏳ Submitting...';
         const formData = new FormData(form);
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbzL2KKwec0TU0r-WpsrVoSZykstA1v8Am4fvlQN6J-W8manlp32_JWG0UH41OsbQe3ZAA/exec';
 
         fetch(scriptURL, { method: 'POST', body: formData })
-          .then(response => {
-            if (!response.ok) throw new Error('Submission failed');
-            return response;
-          })
-          .then(() => {
+          .then(res => {
+            if (!res.ok) throw new Error('Submission failed');
             alert('Contact details submitted successfully!');
             form.reset();
             confirmDataCheckbox.checked = false;
             submitBtn.disabled = true;
-            submitBtn.innerHTML = '✅ Submit';
-            setTimeout(() => window.location.reload(), 2000);
+            submitBtn.textContent = '✅ Submit';
+            setTimeout(() => window.location.reload(), 1500);
           })
-          .catch(error => {
-            console.error('Error!', error.message);
+          .catch(err => {
+            console.error(err);
             alert('Error submitting data. Please try again.');
             submitBtn.disabled = false;
-            submitBtn.innerHTML = '✅ Submit';
+            submitBtn.textContent = '✅ Submit';
           });
       });
 
-      // Hamburger menu toggle
+      // Hamburger toggle
       const hamburgerBtn = document.getElementById('hamburgerBtn');
       const navbarNav = document.getElementById('navbarNav');
       hamburgerBtn.addEventListener('click', () => {
@@ -217,22 +188,21 @@
       });
     });
   </script>
-<!-- Footer -->
-<footer class="bg-white shadow-inner mt-8 py-4 text-center text-sm text-gray-600">
-  <p>
-    &copy; <span id="footerYear"></span> Shaviyani Health Directory. 
-    Developed by 
-    <a href="https://www.ahmedshareef.mv/" target="_blank" rel="noopener noreferrer" class="text-emerald-600 hover:underline">
-      AhmedSharyph
-    </a>.
-  </p>
-</footer>
 
-<script>
-  // Set dynamic year starting from 2025
-  const currentYear = new Date().getFullYear();
-  document.getElementById('footerYear').textContent = currentYear > 2025 ? `2025 - ${currentYear}` : '2025';
-</script>
+  <!-- Footer -->
+  <footer class="bg-white shadow-inner mt-8 py-4 text-center text-sm text-gray-600">
+    <p>
+      &copy; <span id="footerYear"></span> Shaviyani Health Directory. 
+      Developed by 
+      <a href="https://www.ahmedshareef.mv/" target="_blank" rel="noopener noreferrer" class="text-emerald-600 hover:underline">AhmedSharyph</a>.
+    </p>
+  </footer>
+
+  <script>
+    // Dynamic year starting from 2025
+    const currentYear = new Date().getFullYear();
+    document.getElementById('footerYear').textContent = currentYear > 2025 ? `2025 - ${currentYear}` : '2025';
+  </script>
 
 </body>
 </html>
