@@ -1,17 +1,24 @@
-const CACHE_NAME = "shaviyanihealthdirectory-cache-v1.2";
+const CACHE_NAME = "shaviyanihealthdirectory-cache-v1.3";
+
+// Get base path dynamically so it works even if repo name changes
+const basePath = self.registration.scope.replace(self.location.origin, "").replace(/\/$/, "");
+
 const urlsToCache = [
-  "/shaviyanihealthdirectory/",
-  "/shaviyanihealthdirectory/index.html",
-  "/shaviyanihealthdirectory/app.js",
-  "/shaviyanihealthdirectory/install.js",
-  "/shaviyanihealthdirectory/ft_logo.png",
-  "/shaviyanihealthdirectory/manifest.json"
-  // Note: No style.css since Tailwind is loaded via CDN
+  `${basePath}/`,
+  `${basePath}/index.html`,
+  `${basePath}/app.js`,
+  `${basePath}/install.js`,
+  `${basePath}/ft_logo.png`,
+  `${basePath}/manifest.json`
+  // Tailwind CSS is still via CDN, so no style.css here
 ];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(urlsToCache))
+    caches.open(CACHE_NAME).then((cache) => {
+      console.log("📦 Caching app shell:", urlsToCache);
+      return cache.addAll(urlsToCache);
+    })
   );
 });
 
