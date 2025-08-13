@@ -1,14 +1,14 @@
 {
-  "name": "mila-thuruHealthdirectoy",
-  "short_name": "mila-thuruHealthdirectoy",
-  "description": "Find any house address in Sh. Funadhoo with pinpoint accuracy using mila-thuruHealthdirectoy.",
-  "start_url": "/mila-thuruHealthdirectoy/index.html",
+  "name": "shaviyanihealthdirectory",
+  "short_name": "shaviyanihealthdirectory",
+  "description": "Find any house address in Sh. Funadhoo with pinpoint accuracy using shaviyanihealthdirectory.",
+  "start_url": "/shaviyanihealthdirectory/index.html",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#00bcd4",
   "theme_color": "#00bcd4",
   "lang": "en",
-  "scope": "/mila-thuruHealthdirectoy/",
+  "scope": "/shaviyanihealthdirectory/",
   "icons": [
     {
       "src": "ft_logo.png",
