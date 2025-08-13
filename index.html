@@ -90,11 +90,10 @@
       navbarNav.classList.toggle('hidden');
     });
 
-    // Search filtering
-    function normalize(str) {
-      return (str || '').toString().toLowerCase().replace(/\s+/g, ' ').trim();
-    }
+    // Directory search and sorting
+    function normalize(str) { return (str || '').toString().toLowerCase().replace(/\s+/g, ' ').trim(); }
     let allRows = [];
+
     async function loadData() {
       const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwndImcPMsQCTx1xLtxolE7Q7nOdN_nVpmOh7fw0U0Sy0-0u30Chp6ovUVhJgk2XdRuNg/exec';
       const container = document.getElementById('directoryContainer');
@@ -156,6 +155,7 @@
         console.error(error);
       }
     }
+
     function filterData() {
       const term = normalize(document.getElementById('searchInput').value);
       if (!term) {
@@ -186,6 +186,7 @@
         if (msg) msg.remove();
       }
     }
+
     function enableSorting() {
       const tables = document.querySelectorAll('table.sortable-table');
       tables.forEach(table => {
@@ -197,40 +198,45 @@
             const rowsArray = Array.from(tbody.querySelectorAll('tr'));
             let currentSort = th.getAttribute('data-sort') || 'none';
             headers.forEach(h => {
-              if (h !== th) {
-                h.setAttribute('data-sort', 'none');
-                h.querySelector('.sort-arrow').textContent = '';
-              }
+              if (h !== th) { h.setAttribute('data-sort','none'); h.querySelector('.sort-arrow').textContent=''; }
             });
-            let newSort = (currentSort === 'none' || currentSort === 'desc') ? 'asc' : 'desc';
+            let newSort = (currentSort==='none'||currentSort==='desc')?'asc':'desc';
             th.setAttribute('data-sort', newSort);
-            th.querySelector('.sort-arrow').textContent = newSort === 'asc' ? '▲' : '▼';
-            rowsArray.sort((a, b) => {
-              let aText = a.children[colIndex].textContent.trim().toLowerCase();
-              let bText = b.children[colIndex].textContent.trim().toLowerCase();
-              if (colIndex === 0) {
-                aText = aText.replace(/\D/g, '') || '0';
-                bText = bText.replace(/\D/g, '') || '0';
-                return newSort === 'asc'
-                  ? aText.localeCompare(bText, undefined, {numeric:true})
-                  : bText.localeCompare(aText, undefined, {numeric:true});
+            th.querySelector('.sort-arrow').textContent = newSort==='asc'?'▲':'▼';
+            rowsArray.sort((a,b)=>{
+              let aText=a.children[colIndex].textContent.trim().toLowerCase();
+              let bText=b.children[colIndex].textContent.trim().toLowerCase();
+              if(colIndex===0){aText=aText.replace(/\D/g,'')||'0';bText=bText.replace(/\D/g,'')||'0';
+                return newSort==='asc'?aText.localeCompare(bText,undefined,{numeric:true}):bText.localeCompare(aText,undefined,{numeric:true});
               }
-              if (aText < bText) return newSort === 'asc' ? -1 : 1;
-              if (aText > bText) return newSort === 'asc' ? 1 : -1;
+              if(aText<bText)return newSort==='asc'? -1:1;
+              if(aText>bText)return newSort==='asc'? 1:-1;
               return 0;
             });
-            rowsArray.forEach(row => tbody.appendChild(row));
+            rowsArray.forEach(row=>tbody.appendChild(row));
           });
         });
       });
     }
-    document.addEventListener('DOMContentLoaded', () => {
+
+    document.addEventListener('DOMContentLoaded', ()=>{
       document.getElementById('searchInput').addEventListener('input', filterData);
     });
     window.onload = loadData;
   </script>
 
-  <!-- PWA install prompt -->
+  <!-- PWA Install Prompt -->
   <script src="./install.js" defer></script>
+
+  <!-- Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      const swPath = `${window.location.pathname.replace(/\/[^\/]*$/, '')}/service-worker.js`;
+      navigator.serviceWorker.register(swPath)
+        .then(reg => console.log('✅ Service Worker registered with scope:', reg.scope))
+        .catch(err => console.error('❌ Service Worker registration failed:', err));
+    }
+  </script>
+
 </body>
 </html>
