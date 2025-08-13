@@ -1,4 +1,4 @@
-const CACHE_NAME = "shaviyanihealthdirectory-cache-v5.5";
+const CACHE_NAME = "shaviyanihealthdirectory-cache-v5.6";
 const urlsToCache = [
   "/shaviyanihealthdirectory/",
   "/shaviyanihealthdirectory/index.html",
