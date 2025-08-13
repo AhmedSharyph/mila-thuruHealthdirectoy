@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Shaviyani Health Directory - Add Contact</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
+
+  <!-- Tom Select CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet" />
+
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+    }
+    .ts-control {
+      border-radius: 0.5rem;
+      border-color: #d1d5db;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 text-gray-800 pt-[56px]">
+
+  <!-- Navbar -->
+  <nav class="fixed top-0 left-0 right-0 bg-white shadow z-50">
+    <div class="flex items-center gap-4 px-2 md:px-4 py-2 w-full">
+      <a href="index.html" class="flex items-center whitespace-nowrap">
+        <img src="./logo.png" alt="Logo" class="w-7 h-7 mr-2" />
+        <span class="font-semibold text-emerald-900">Shaviyani Health Directory</span>
+      </a>
+
+      <button id="hamburgerBtn" class="text-xl lg:hidden ml-auto" aria-label="Toggle navigation" aria-expanded="false" aria-controls="navbarNav">
+        &#9776;
+      </button>
+
+      <div id="navbarNav" class="absolute lg:static top-full right-0 bg-white shadow-lg rounded hidden lg:flex flex-col lg:flex-row lg:shadow-none lg:bg-transparent ml-auto">
+        <ul class="flex flex-col lg:flex-row items-end lg:items-center">
+          <li>
+            <a href="index.html" class="block px-4 py-2 text-sm font-medium hover:text-emerald-700">Home</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="max-w-3xl mx-auto py-6 px-4">
+    <div class="bg-white rounded-xl shadow">
+      <div class="bg-emerald-600 text-white text-center rounded-t-xl px-4 py-3">
+        <h5 class="m-0 font-semibold">📇 Fill in Contact Details</h5>
+      </div>
+      <div class="p-6">
+        <form id="contactForm" class="space-y-4">
+          
+          <!-- Health Center -->
+          <div>
+            <label for="healthCenter" class="block mb-1 font-medium">Health Center</label>
+            <select id="healthCenter" name="Health Center" required>
+              <option value="" disabled selected>Select a Health Center</option>
+              <option value="Shaviyani Atoll Hospital">Shaviyani Atoll Hospital</option>
+              <option value="Kandutheemu Health Center">Kanditheemu Health Center</option>
+              <option value="Noomaraa Health Center">Noomaraa Health Center</option>
+              <option value="Goidhoo Health Center">Goidhoo Health Center</option>
+              <option value="Feydhoo Health Center">Feydhoo Health Center</option>
+              <option value="Feevaku Health Center">Feevaku Health Center</option>
+              <option value="Bilehfahi Health Center">Bilehfahi Health Center</option>
+              <option value="Fokaidhoo Health Center">Fokaidhoo Health Center</option>
+              <option value="Narudhoo Health Center">Narudhoo Health Center</option>
+              <option value="Maroshi Health Center">Maroshi Health Center</option>
+              <option value="Lhaimagu Health Center">Lhaimagu Health Center</option>
+              <option value="Komandoo Health Center">Komandoo Health Center</option>
+              <option value="Maaungoodhoo Health Center">Maaungoodhoo Health Center</option>
+              <option value="Milandhoo Health Center">Milandhoo Health Center</option>
+            </select>
+          </div>
+
+          <!-- Contact Number -->
+          <div>
+            <label for="contactNumber" class="block mb-1 font-medium">Contact Number</label>
+            <input type="tel" id="contactNumber" name="Contact Number" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-600" />
+          </div>
+
+          <!-- Department -->
+          <div>
+            <label for="department" class="block mb-1 font-medium">Department</label>
+            <select id="department" name="Department" required></select>
+          </div>
+
+          <!-- Assigned Staff -->
+          <div>
+            <label for="assignedTo" class="block mb-1 font-medium">Assigned Staff Name</label>
+            <input type="text" id="assignedTo" name="Role or Function" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-600" />
+          </div>
+
+          <!-- Role -->
+          <div>
+            <label for="role" class="block mb-1 font-medium">Role or Function</label>
+            <select id="role" name="Assigned To" required></select>
+          </div>
+
+          <!-- Confirmation -->
+          <div class="flex items-center gap-2">
+            <input type="checkbox" id="confirmDataCheckbox" class="w-4 h-4" />
+            <label for="confirmDataCheckbox" class="text-sm">Yep, everything looks good</label>
+          </div>
+
+          <!-- Submit -->
+          <div>
+            <button type="submit" id="submitBtn" disabled class="w-full bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 disabled:opacity-60 flex items-center justify-center gap-2">
+              ✅ Submit
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <!-- Tom Select JS -->
+  <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxI_5lWR-Bvk-FfqFgM2yp_tCgbGcUqxQY1kgPgAMb-7FdpyFTlfp3cvkBNoW2uTou77w/exec";
+
+      const healthCenterSelect = document.getElementById('healthCenter');
+      const departmentSelect = document.getElementById('department');
+      const roleSelect = document.getElementById('role');
+      const confirmDataCheckbox = document.getElementById('confirmDataCheckbox');
+      const submitBtn = document.getElementById('submitBtn');
+      const form = document.getElementById('contactForm');
+
+      // Initialize Tom Select
+      new TomSelect(healthCenterSelect, {
+        create: false,
+        placeholder: "Select a Health Center",
+        maxItems: 1,
+        sortField: false,
+      });
+
+      // Populate dropdowns
+      fetch(WEB_APP_URL + "?action=getDropdownData")
+        .then(response => response.json())
+        .then(data => {
+          function populateSelect(selectElem, options, placeholderText, allowCreate = true, sort = true) {
+            selectElem.innerHTML = '';
+            const defaultOption = new Option(placeholderText, "", true, true);
+            defaultOption.disabled = true;
+            selectElem.add(defaultOption);
+
+            if (sort) options.sort();
+
+            options.forEach(value => {
+              selectElem.add(new Option(value, value));
+            });
+
+            new TomSelect(selectElem, {
+              create: allowCreate,
+              placeholder: placeholderText,
+              maxItems: 1,
+              sortField: sort ? "text" : undefined,
+            });
+          }
+
+          populateSelect(departmentSelect, data.departments, "Select a Department");
+          populateSelect(roleSelect, data.roles, "Select a Role or Function");
+        })
+        .catch(err => {
+          console.error(err);
+          alert('Failed to load dropdown data. Please refresh the page.');
+        });
+
+      // Enable submit on confirm
+      confirmDataCheckbox.addEventListener('change', () => {
+        submitBtn.disabled = !confirmDataCheckbox.checked;
+      });
+
+      // Form submission
+      const scriptURL = 'https://script.google.com/macros/s/AKfycbzL2KKwec0TU0r-WpsrVoSZykstA1v8Am4fvlQN6J-W8manlp32_JWG0UH41OsbQe3ZAA/exec';
+      form.addEventListener('submit', e => {
+        e.preventDefault();
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '⏳ Submitting...';
+
+        const formData = new FormData(form);
+
+        fetch(scriptURL, { method: 'POST', body: formData })
+          .then(response => {
+            if (!response.ok) throw new Error('Submission failed');
+            return response;
+          })
+          .then(() => {
+            alert('Contact details submitted successfully!');
+            form.reset();
+            confirmDataCheckbox.checked = false;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '✅ Submit';
+            setTimeout(() => window.location.reload(), 2000);
+          })
+          .catch(error => {
+            console.error('Error!', error.message);
+            alert('Error submitting data. Please try again.');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '✅ Submit';
+          });
+      });
+
+      // Hamburger menu toggle
+      const hamburgerBtn = document.getElementById('hamburgerBtn');
+      const navbarNav = document.getElementById('navbarNav');
+      hamburgerBtn.addEventListener('click', () => {
+        const expanded = hamburgerBtn.getAttribute('aria-expanded') === 'true';
+        hamburgerBtn.setAttribute('aria-expanded', !expanded);
+        navbarNav.classList.toggle('hidden');
+      });
+    });
+  </script>
+
+</body>
+</html>
