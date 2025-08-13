@@ -75,6 +75,22 @@
       navbarNav.classList.toggle('hidden');
     });
   </script>
+<!-- Footer -->
+<footer class="bg-white shadow-inner mt-8 py-4 text-center text-sm text-gray-600">
+  <p>
+    &copy; <span id="footerYear"></span> Shaviyani Health Directory. 
+    Developed by 
+    <a href="https://www.ahmedshareef.mv/" target="_blank" rel="noopener noreferrer" class="text-emerald-600 hover:underline">
+      AhmedSharyph
+    </a>.
+  </p>
+</footer>
+
+<script>
+  // Set dynamic year starting from 2025
+  const currentYear = new Date().getFullYear();
+  document.getElementById('footerYear').textContent = currentYear > 2025 ? `2025 - ${currentYear}` : '2025';
+</script>
 
 </body>
 </html>
