@@ -1,11 +1,11 @@
-const CACHE_NAME = "mila-thuruHealthdirectoy-cache-v1";
+const CACHE_NAME = "shaviyanihealthdirectory-cache-v1";
 const urlsToCache = [
-  "/mila-thuruHealthdirectoy/",
-  "/mila-thuruHealthdirectoy/index.html",
-  "/mila-thuruHealthdirectoy/app.js",
-  "/mila-thuruHealthdirectoy/install.js",
-  "/mila-thuruHealthdirectoy/ft_logo.png",
-  "/mila-thuruHealthdirectoy/manifest.json"
+  "/shaviyanihealthdirectory/",
+  "/shaviyanihealthdirectory/index.html",
+  "/shaviyanihealthdirectory/app.js",
+  "/shaviyanihealthdirectory/install.js",
+  "/shaviyanihealthdirectory/ft_logo.png",
+  "/shaviyanihealthdirectory/manifest.json"
   // Note: No style.css since Tailwind is loaded via CDN
 ];
 
