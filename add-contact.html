@@ -220,6 +220,22 @@
       });
     });
   </script>
+<script>
+  const currentPath = window.location.pathname;
+  const navbarLinks = document.querySelectorAll('#navbarNav a');
 
+  navbarLinks.forEach(link => {
+    const href = link.getAttribute('href');
+
+    if ((href === 'https://ahmedsharyph.github.io/shaviyanihealthdirectory/' || href === 'index.html') &&
+        (currentPath === '/shaviyanihealthdirectory/' || currentPath.endsWith('index.html'))) {
+      link.style.display = 'none';
+    }
+
+    if (href === 'add-contact.html' && currentPath.endsWith('add-contact.html')) {
+      link.style.display = 'none';
+    }
+  });
+</script>
 </body>
 </html>
