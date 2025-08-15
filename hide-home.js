@@ -1,4 +1,3 @@
-<script>
 document.addEventListener('DOMContentLoaded', () => {
   const currentPath = window.location.pathname;
   const homeLink = document.querySelector('#navbarNav a[href="./"], #navbarNav a[href="index.html"]');
@@ -7,4 +6,3 @@ document.addEventListener('DOMContentLoaded', () => {
     homeLink.style.display = 'none';
   }
 });
-</script>
