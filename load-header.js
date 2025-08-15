@@ -35,7 +35,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-<script>
 document.addEventListener('DOMContentLoaded', () => {
   const currentPath = window.location.pathname;
   const searchForm = document.getElementById('searchForm');
@@ -44,4 +43,3 @@ document.addEventListener('DOMContentLoaded', () => {
     searchForm.style.display = 'none';
   }
 });
-</script>
