@@ -1,4 +1,3 @@
-// offline.js
 const scriptURL = 'https://script.google.com/macros/s/AKfycbzL2KKwec0TU0r-WpsrVoSZykstA1v8Am4fvlQN6J-W8manlp32_JWG0UH41OsbQe3ZAA/exec';
 let db;
 
@@ -8,21 +7,21 @@ const request = indexedDB.open('offlineContactsDB', 1);
 request.onupgradeneeded = (event) => {
   db = event.target.result;
   if (!db.objectStoreNames.contains('contacts')) {
-    db.createObjectStore('contacts', { autoIncrement: true });
+    db.createObjectStore('contacts', { keyPath: 'id', autoIncrement: true });
   }
 };
 
 request.onsuccess = (event) => {
   db = event.target.result;
   console.log('Offline DB ready');
-  sendPendingContacts(); // Try sending stored contacts on load
+  sendPendingContacts();
 };
 
 request.onerror = (event) => {
   console.error('IndexedDB error:', event.target.errorCode);
 };
 
-// 2️⃣ Floating notification function
+// 2️⃣ Notification utility
 function showNotification(message, type = 'success', duration = 4000) {
   const box = document.createElement('div');
   box.className = `
@@ -35,60 +34,78 @@ function showNotification(message, type = 'success', duration = 4000) {
   setTimeout(() => box.remove(), duration);
 }
 
-// 3️⃣ Save a contact locally if offline
-function saveOffline(contactData) {
-  const tx = db.transaction('contacts', 'readwrite');
-  const store = tx.objectStore('contacts');
-  store.add(contactData);
-  showNotification('📥 You are offline. Contact saved locally.', 'success');
+// 3️⃣ Offline banner
+function showOfflineBanner() {
+  if (!document.getElementById('offlineBanner')) {
+    const banner = document.createElement('div');
+    banner.id = 'offlineBanner';
+    banner.className = 'fixed top-0 left-0 right-0 bg-red-500 text-white text-center p-2 z-50 font-semibold';
+    banner.textContent = '⚠️ You are offline. Contacts will be saved locally.';
+    document.body.appendChild(banner);
+  }
 }
 
-// 4️⃣ Send all pending contacts
+function hideOfflineBanner() {
+  const banner = document.getElementById('offlineBanner');
+  if (banner) banner.remove();
+}
+
+// 4️⃣ Save offline
+function saveOffline(contactData) {
+  const tx = db.transaction('contacts', 'readwrite');
+  tx.objectStore('contacts').add(contactData);
+  showNotification('📥 Contact saved locally');
+}
+
+// 5️⃣ Send pending contacts
 function sendPendingContacts() {
   if (!navigator.onLine || !db) return;
 
   const tx = db.transaction('contacts', 'readwrite');
   const store = tx.objectStore('contacts');
+
   const getAll = store.getAll();
+  const getKeys = store.getAllKeys();
 
   getAll.onsuccess = () => {
-    const allContacts = getAll.result;
-    if (!allContacts.length) return;
+    const contacts = getAll.result;
+    if (!contacts.length) return;
 
-    let sentCount = 0;
+    getKeys.onsuccess = () => {
+      const keys = getKeys.result;
+      contacts.forEach((contact, i) => {
+        const formData = new FormData();
+        Object.keys(contact).forEach(k => { if(k !== 'id') formData.append(k, contact[k]); });
 
-    allContacts.forEach((contact, index) => {
-      const formData = new FormData();
-      for (let key in contact) formData.append(key, contact[key]);
-
-      fetch(scriptURL, { method: 'POST', body: formData })
-        .then(() => {
-          const deleteTx = db.transaction('contacts', 'readwrite');
-          const deleteStore = deleteTx.objectStore('contacts');
-          deleteStore.delete(index + 1);
-
-          sentCount++;
-          if (sentCount === allContacts.length) {
-            showNotification(`✅ ${sentCount} offline contact(s) synced successfully!`);
-          }
-        })
-        .catch((err) => {
-          console.error('Failed to send offline contact:', err);
-          showNotification('⚠️ Some offline contacts could not be synced.', 'error');
-        });
-    });
+        fetch(scriptURL, { method: 'POST', body: formData })
+          .then(() => {
+            store.delete(keys[i]);
+            if (i === contacts.length - 1) showNotification(`✅ ${contacts.length} offline contact(s) synced!`);
+          })
+          .catch(err => {
+            console.error('Failed to sync contact:', err);
+            showNotification('⚠️ Some contacts could not be synced', 'error');
+          });
+      });
+    };
   };
 }
 
-// 5️⃣ Listen for online event
-window.addEventListener('online', sendPendingContacts);
+// 6️⃣ Online/offline events
+window.addEventListener('online', () => {
+  hideOfflineBanner();
+  sendPendingContacts();
+});
 
-// 6️⃣ Hook form submission
+window.addEventListener('offline', () => {
+  showOfflineBanner();
+});
+
+// 7️⃣ Hook form submission
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('contactForm');
   const submitBtn = document.getElementById('submitBtn');
   const confirmCheckbox = document.getElementById('confirmDataCheckbox');
-
   if (!form) return;
 
   form.addEventListener('submit', (e) => {
@@ -98,35 +115,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const formData = new FormData(form);
     const dataObj = {};
-    formData.forEach((value, key) => (dataObj[key] = value));
+    formData.forEach((v, k) => dataObj[k] = v);
 
     if (!navigator.onLine) {
       saveOffline(dataObj);
       form.reset();
       confirmCheckbox.checked = false;
-      submitBtn.disabled = true;
       submitBtn.innerHTML = '✅ Submit';
       return;
     }
 
-    // Online submission
     fetch(scriptURL, { method: 'POST', body: formData })
-      .then((res) => {
+      .then(res => {
         if (!res.ok) throw new Error('Submission failed');
         showNotification('✅ Contact submitted successfully!');
         form.reset();
         confirmCheckbox.checked = false;
-        submitBtn.disabled = true;
         submitBtn.innerHTML = '✅ Submit';
-        sendPendingContacts(); // Also send any stored offline contacts
+        sendPendingContacts();
       })
-      .catch((err) => {
+      .catch(err => {
         console.error(err);
         showNotification('⚠️ Submission failed. Saved offline.', 'error');
         saveOffline(dataObj);
         form.reset();
         confirmCheckbox.checked = false;
-        submitBtn.disabled = true;
         submitBtn.innerHTML = '✅ Submit';
       });
   });
