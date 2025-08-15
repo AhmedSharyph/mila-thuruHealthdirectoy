@@ -7,4 +7,3 @@ document.addEventListener('DOMContentLoaded', () => {
     addContactLink.style.display = 'none';
   }
 });
-</script>
