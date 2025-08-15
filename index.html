@@ -17,61 +17,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="h-screen m-0 p-0 font-sans bg-gray-50">
-
   <!-- Navbar -->
-<header>
-  <nav class="fixed top-0 left-0 right-0 bg-[#00bcd4] shadow z-50">
-  <div class="max-w-7xl mx-auto flex items-center justify-between px-4 py-3 relative">
-
-    <!-- Logo + Title -->
-    <a href="index.html" class="flex items-center gap-2">
-      <img src="./logo.png" alt="Logo" class="w-8 h-8">
-      <span class="hidden lg:inline font-semibold text-emerald-900">Shaviyani Health Directory</span>
-    </a>
-
-    <!-- Search Form -->
-    <form id="searchForm" class="flex flex-grow mx-2 md:mx-4" role="search" onsubmit="return false;">
-      <input
-        id="searchInput"
-        type="search"
-        placeholder="🔍 Search by any field..."
-        autocomplete="off"
-        aria-label="Search directory"
-        class="w-full border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600"
-      />
-    </form>
-
-    <!-- Hamburger (mobile) -->
-    <button id="hamburgerBtn" class="text-2xl lg:hidden" aria-label="Toggle navigation" aria-expanded="false">
-      &#9776;
-    </button>
-
-    <!-- Navigation Links -->
-
-        <div id="navbarNav" class="hidden lg:flex lg:items-center lg:space-x-4">
-            <a href="https://ahmedsharyph.github.io/shaviyanihealthdirectory/" class="block px-4 py-2 text-sm font-medium hover:text-emerald-700">Home</a>
-<a href="add-contact.html" class="block px-4 py-2 text-sm font-medium hover:text-emerald-700">Add Contact</a>
-    </div>
-  
-  </div>
-</nav>
-
-
-</header>
- <!-- Navbar -->
-
-
-<script>
-  const hamburgerBtn = document.getElementById('hamburgerBtn');
-  const navbarNav = document.getElementById('navbarNav');
-
-  hamburgerBtn.addEventListener('click', () => {
-    const expanded = hamburgerBtn.getAttribute('aria-expanded') === 'true';
-    hamburgerBtn.setAttribute('aria-expanded', !expanded);
-    navbarNav.classList.toggle('hidden');
-  });
-</script>
-
+  <div id="header-placeholder"></div>
   <!-- Main Content -->
 <main class="max-w-7xl mx-auto mt-20 px-4" id="directoryContainer">
 <p class="text-gray-500 text-center text-xs sm:text-sm md:text-base">
@@ -281,36 +228,6 @@ window.onload = loadData;
   <script src="https://ahmedsharyph.github.io/shaviyanihealthdirectory/install.js" defer></script>
 
   <!-- hide -->
-<script>
-  const currentPath = window.location.pathname;
-
-  // Automatically hide any navbar link pointing to the current page
-  const navbarLinks = document.querySelectorAll('#navbarNav a');
-  navbarLinks.forEach(link => {
-    const href = link.getAttribute('href');
-
-    // Compare the href with current path
-    // For absolute URLs, convert them to path only
-    let hrefPath;
-    try {
-      hrefPath = new URL(href, window.location.origin).pathname;
-    } catch {
-      hrefPath = href; // fallback for relative paths
-    }
-
-    if (hrefPath === currentPath || (hrefPath.endsWith('index.html') && currentPath.endsWith('index.html'))) {
-      link.style.display = 'none';
-    }
-  });
-
-  // Example: hide search form on specific pages
-  const searchForm = document.getElementById('searchForm');
-  const pagesToHideSearch = ['/shaviyanihealthdirectory/add-contact.html']; // add more paths if needed
-  if (searchForm && pagesToHideSearch.includes(currentPath)) {
-    searchForm.style.display = 'none';
-  }
-</script>
-
-
+<script src="load-header.js"></script>
 </body>
 </html>
