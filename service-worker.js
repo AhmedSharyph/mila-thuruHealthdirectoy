@@ -8,6 +8,7 @@ const urlsToCache = [
   "/shaviyanihealthdirectory/add-contact.js",
   "/shaviyanihealthdirectory/load-header.js",
   "/shaviyanihealthdirectory/install.js",
+  "/shaviyanihealthdirectory/offline.js",
   "/shaviyanihealthdirectory/ft_logo.png",
   "/shaviyanihealthdirectory/logo.png",
   "/shaviyanihealthdirectory/manifest.json",
@@ -16,46 +17,35 @@ const urlsToCache = [
   "/shaviyanihealthdirectory/tom-select.css"
 ];
 
-// Install: cache all static assets
+// Install event
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(urlsToCache))
   );
+  self.skipWaiting(); // activate immediately
 });
 
-// Activate: remove old caches
+// Fetch event
+self.addEventListener("fetch", (event) => {
+  event.respondWith(
+    caches.match(event.request).then((cached) => cached || fetch(event.request))
+      .catch(() => {
+        // Offline fallback
+        if (event.request.destination === 'document') {
+          return caches.match('/shaviyanihealthdirectory/index.html');
+        }
+      })
+  );
+});
+
+// Activate event
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) =>
       Promise.all(
-        cacheNames
-          .filter((name) => name !== CACHE_NAME)
-          .map((name) => caches.delete(name))
+        cacheNames.filter(name => name !== CACHE_NAME).map(name => caches.delete(name))
       )
     )
   );
-});
-
-// Fetch: dynamic caching for Web App JSON, cache-first for static assets
-self.addEventListener("fetch", (event) => {
-  const requestURL = new URL(event.request.url);
-
-  // 1️⃣ Dynamic cache for Web App JSON
-  if (requestURL.href.startsWith("https://script.google.com/macros/")) {
-    event.respondWith(
-      fetch(event.request)
-        .then((response) => {
-          const responseClone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
-          return response;
-        })
-        .catch(() => caches.match(event.request))
-    );
-    return;
-  }
-
-  // 2️⃣ Static assets: cache-first
-  event.respondWith(
-    caches.match(event.request).then((response) => response || fetch(event.request))
-  );
+  self.clients.claim();
 });
