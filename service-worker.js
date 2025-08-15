@@ -1,4 +1,4 @@
-const CACHE_NAME = "shaviyanihealthdirectory-cache-v6.1";
+const CACHE_NAME = "shaviyanihealthdirectory-cache-v6.2";
 const urlsToCache = [
   "/shaviyanihealthdirectory/",
   "/shaviyanihealthdirectory/index.html",
@@ -17,35 +17,47 @@ const urlsToCache = [
   "/shaviyanihealthdirectory/tom-select.css"
 ];
 
-// Install event
-self.addEventListener("install", (event) => {
+// -------------------
+// Install Event
+// -------------------
+self.addEventListener("install", event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(urlsToCache))
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(urlsToCache))
+      .then(() => self.skipWaiting()) // Activate immediately
   );
-  self.skipWaiting(); // activate immediately
 });
 
-// Fetch event
-self.addEventListener("fetch", (event) => {
+// -------------------
+// Activate Event
+// -------------------
+self.addEventListener("activate", event => {
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(
+        keys.filter(key => key !== CACHE_NAME)
+            .map(key => caches.delete(key))
+      )
+    ).then(() => self.clients.claim())
+  );
+});
+
+// -------------------
+// Fetch Event
+// -------------------
+self.addEventListener("fetch", event => {
   event.respondWith(
-    caches.match(event.request).then((cached) => cached || fetch(event.request))
-      .catch(() => {
-        // Offline fallback
-        if (event.request.destination === 'document') {
+    caches.match(event.request).then(cachedResponse => {
+      // Serve cached version if available
+      if (cachedResponse) return cachedResponse;
+
+      // Otherwise fetch from network
+      return fetch(event.request).catch(() => {
+        // Offline fallback for navigations (HTML pages)
+        if (event.request.mode === 'navigate') {
           return caches.match('/shaviyanihealthdirectory/index.html');
         }
-      })
+      });
+    })
   );
-});
-
-// Activate event
-self.addEventListener("activate", (event) => {
-  event.waitUntil(
-    caches.keys().then((cacheNames) =>
-      Promise.all(
-        cacheNames.filter(name => name !== CACHE_NAME).map(name => caches.delete(name))
-      )
-    )
-  );
-  self.clients.claim();
 });
