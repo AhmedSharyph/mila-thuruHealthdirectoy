@@ -17,10 +17,6 @@ const urlsToCache = [
   "/shaviyanihealthdirectory/tom-select.css"
 ];
 
-const OFFLINE_DB_NAME = "offlineContactsDB";
-const OFFLINE_STORE = "contacts";
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzL2KKwec0TU0r-WpsrVoSZykstA1v8Am4fvlQN6J-W8manlp32_JWG0UH41OsbQe3ZAA/exec';
-
 // -------------------
 // Install Event
 // -------------------
@@ -37,91 +33,78 @@ self.addEventListener("install", event => {
 // -------------------
 self.addEventListener("activate", event => {
   event.waitUntil(
-    caches.keys()
-      .then(keys => Promise.all(
+    caches.keys().then(keys =>
+      Promise.all(
         keys.filter(key => key !== CACHE_NAME)
             .map(key => caches.delete(key))
-      ))
-      .then(() => self.clients.claim())
+      )
+    ).then(() => self.clients.claim())
   );
 });
 
 // -------------------
-// Fetch Event (Cache-first, fallback to network)
+// Fetch Event
 // -------------------
 self.addEventListener("fetch", event => {
   event.respondWith(
-    caches.match(event.request)
-      .then(cachedResponse => cachedResponse || fetch(event.request))
-      .catch(() => {
+    caches.match(event.request).then(cachedResponse => {
+      if (cachedResponse) return cachedResponse;
+
+      return fetch(event.request).catch(() => {
         // Offline fallback for navigations
         if (event.request.mode === 'navigate') {
           return caches.match('/shaviyanihealthdirectory/index.html');
         }
-      })
+      });
+    })
   );
 });
 
 // -------------------
-// IndexedDB Helper
-// -------------------
-function openDB() {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open(OFFLINE_DB_NAME, 1);
-    request.onupgradeneeded = event => {
-      const db = event.target.result;
-      if (!db.objectStoreNames.contains(OFFLINE_STORE)) {
-        db.createObjectStore(OFFLINE_STORE, { autoIncrement: true });
-      }
-    };
-    request.onsuccess = event => resolve(event.target.result);
-    request.onerror = event => reject(event.target.error);
-  });
-}
-
-// -------------------
-// Save contact offline
-// -------------------
-async function saveOffline(contactData) {
-  const db = await openDB();
-  const tx = db.transaction(OFFLINE_STORE, 'readwrite');
-  tx.objectStore(OFFLINE_STORE).add(contactData);
-}
-
-// -------------------
-// Send pending offline contacts
-// -------------------
-async function sendPendingContacts() {
-  if (!navigator.onLine) return;
-  const db = await openDB();
-  const tx = db.transaction(OFFLINE_STORE, 'readwrite');
-  const store = tx.objectStore(OFFLINE_STORE);
-  const getAll = store.getAll();
-
-  getAll.onsuccess = async () => {
-    const contacts = getAll.result;
-    if (!contacts.length) return;
-
-    for (let i = 0; i < contacts.length; i++) {
-      const contact = contacts[i];
-      const formData = new FormData();
-      for (let key in contact) formData.append(key, contact[key]);
-
-      try {
-        const res = await fetch(SCRIPT_URL, { method: 'POST', body: formData });
-        if (res.ok) store.delete(i + 1);
-      } catch (err) {
-        console.error('Failed to send offline contact:', err);
-      }
-    }
-  };
-}
-
-// -------------------
-// Listen for online event
+// Background Sync Event
 // -------------------
 self.addEventListener('sync', event => {
   if (event.tag === 'sync-offline-contacts') {
-    event.waitUntil(sendPendingContacts());
+    event.waitUntil(sendOfflineContacts());
   }
 });
+
+// -------------------
+// Helper: Send Offline Contacts
+// -------------------
+async function sendOfflineContacts() {
+  const DB_NAME = 'offlineContactsDB';
+  const STORE_NAME = 'contacts';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzL2KKwec0TU0r-WpsrVoSZykstA1v8Am4fvlQN6J-W8manlp32_JWG0UH41OsbQe3ZAA/exec';
+
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, 1);
+    request.onsuccess = event => {
+      const db = event.target.result;
+      const tx = db.transaction(STORE_NAME, 'readwrite');
+      const store = tx.objectStore(STORE_NAME);
+      const getAll = store.getAll();
+
+      getAll.onsuccess = async () => {
+        const contacts = getAll.result;
+        if (!contacts.length) return resolve();
+
+        for (let i = 0; i < contacts.length; i++) {
+          const contact = contacts[i];
+          const formData = new FormData();
+          for (let key in contact) formData.append(key, contact[key]);
+
+          try {
+            const res = await fetch(SCRIPT_URL, { method: 'POST', body: formData });
+            if (res.ok) store.delete(i + 1);
+          } catch (err) {
+            console.error('Background sync failed for contact:', contact, err);
+          }
+        }
+        resolve();
+      };
+      getAll.onerror = () => reject(getAll.error);
+    };
+    request.onerror = () => reject(request.error);
+  });
+}
