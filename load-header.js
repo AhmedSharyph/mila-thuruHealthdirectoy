@@ -6,8 +6,16 @@ fetch('header.html')
 
     // Hide navbar link pointing to current page
     document.querySelectorAll('#navbarNav a').forEach(link => {
-      const hrefPath = new URL(link.getAttribute('href'), window.location.origin).pathname;
-      if (hrefPath === currentPath || (hrefPath.endsWith('index.html') && currentPath.endsWith('index.html'))) {
+      const href = link.getAttribute('href');
+
+      // Hide Home on homepage
+      if ((href === './' || href.endsWith('index.html')) && 
+          (currentPath.endsWith('/') || currentPath.endsWith('index.html'))) {
+        link.style.display = 'none';
+      }
+
+      // Hide Add Contact on its page
+      if (href === 'add-contact.html' && currentPath.endsWith('add-contact.html')) {
         link.style.display = 'none';
       }
     });
