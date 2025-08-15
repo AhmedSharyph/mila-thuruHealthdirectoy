@@ -4,18 +4,17 @@ fetch('header.html')
     document.getElementById('header-placeholder').innerHTML = data;
     const currentPath = window.location.pathname;
 
-    // Hide navbar link pointing to current page
+    // Hide navbar links pointing to the current page
     document.querySelectorAll('#navbarNav a').forEach(link => {
-      const href = link.getAttribute('href');
-
-      // Hide Home on homepage
-      if ((href === './' || href.endsWith('index.html')) && 
-          (currentPath.endsWith('/') || currentPath.endsWith('index.html'))) {
-        link.style.display = 'none';
+      let hrefPath;
+      try {
+        hrefPath = new URL(link.getAttribute('href'), window.location.origin).pathname;
+      } catch {
+        hrefPath = link.getAttribute('href');
       }
 
-      // Hide Add Contact on its page
-      if (href === 'add-contact.html' && currentPath.endsWith('add-contact.html')) {
+      if (hrefPath === currentPath || 
+          (hrefPath.endsWith('index.html') && (currentPath.endsWith('/') || currentPath.endsWith('index.html')))) {
         link.style.display = 'none';
       }
     });
