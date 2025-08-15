@@ -1,136 +1,129 @@
-const scriptURL = 'https://script.google.com/macros/s/AKfycbzL2KKwec0TU0r-WpsrVoSZykstA1v8Am4fvlQN6J-W8manlp32_JWG0UH41OsbQe3ZAA/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzL2KKwec0TU0r-WpsrVoSZykstA1v8Am4fvlQN6J-W8manlp32_JWG0UH41OsbQe3ZAA/exec';
+const DB_NAME = 'offlineContactsDB';
+const STORE_NAME = 'contacts';
+
+// -------------------
+// IndexedDB Setup
+// -------------------
 let db;
+const request = indexedDB.open(DB_NAME, 1);
 
-// 1️⃣ IndexedDB setup
-const request = indexedDB.open('offlineContactsDB', 1);
-
-request.onupgradeneeded = (event) => {
+request.onupgradeneeded = event => {
   db = event.target.result;
-  if (!db.objectStoreNames.contains('contacts')) {
-    db.createObjectStore('contacts', { keyPath: 'id', autoIncrement: true });
+  if (!db.objectStoreNames.contains(STORE_NAME)) {
+    db.createObjectStore(STORE_NAME, { autoIncrement: true });
   }
 };
 
-request.onsuccess = (event) => {
+request.onsuccess = event => {
   db = event.target.result;
-  console.log('Offline DB ready');
-  sendPendingContacts();
+  sendPendingContacts(); // try sending on load
 };
 
-request.onerror = (event) => {
-  console.error('IndexedDB error:', event.target.errorCode);
-};
+request.onerror = event => console.error('IndexedDB error:', event.target.errorCode);
 
-// 2️⃣ Notification utility
-function showNotification(message, type = 'success', duration = 4000) {
+// -------------------
+// Notification
+// -------------------
+function showNotification(msg, type='success', duration=4000) {
   const box = document.createElement('div');
   box.className = `
     fixed top-5 left-1/2 -translate-x-1/2 px-4 py-2 rounded-xl shadow-lg z-50
     text-white font-semibold text-center
     ${type === 'success' ? 'bg-green-500' : 'bg-red-500'}
   `;
-  box.textContent = message;
+  box.textContent = msg;
   document.body.appendChild(box);
   setTimeout(() => box.remove(), duration);
 }
 
-// 3️⃣ Offline banner
-function showOfflineBanner() {
-  if (!document.getElementById('offlineBanner')) {
-    const banner = document.createElement('div');
-    banner.id = 'offlineBanner';
-    banner.className = 'fixed top-0 left-0 right-0 bg-red-500 text-white text-center p-2 z-50 font-semibold';
-    banner.textContent = '⚠️ You are offline. Contacts will be saved locally.';
-    document.body.appendChild(banner);
+// -------------------
+// Save Offline
+// -------------------
+function saveOffline(contactData) {
+  if (!db) return;
+  const tx = db.transaction(STORE_NAME, 'readwrite');
+  tx.objectStore(STORE_NAME).add(contactData);
+  showNotification('📥 You are offline. Contact saved locally.', 'success');
+
+  // Register background sync if supported
+  if ('serviceWorker' in navigator && 'SyncManager' in window) {
+    navigator.serviceWorker.ready.then(sw => {
+      sw.sync.register('sync-offline-contacts')
+        .then(() => console.log('Background sync registered'))
+        .catch(err => console.error('Sync registration failed', err));
+    });
   }
 }
 
-function hideOfflineBanner() {
-  const banner = document.getElementById('offlineBanner');
-  if (banner) banner.remove();
-}
-
-// 4️⃣ Save offline
-function saveOffline(contactData) {
-  const tx = db.transaction('contacts', 'readwrite');
-  tx.objectStore('contacts').add(contactData);
-  showNotification('📥 Contact saved locally');
-}
-
-// 5️⃣ Send pending contacts
-function sendPendingContacts() {
+// -------------------
+// Send Pending Contacts
+// -------------------
+async function sendPendingContacts() {
   if (!navigator.onLine || !db) return;
 
-  const tx = db.transaction('contacts', 'readwrite');
-  const store = tx.objectStore('contacts');
-
+  const tx = db.transaction(STORE_NAME, 'readwrite');
+  const store = tx.objectStore(STORE_NAME);
   const getAll = store.getAll();
-  const getKeys = store.getAllKeys();
 
   getAll.onsuccess = () => {
-    const contacts = getAll.result;
-    if (!contacts.length) return;
+    const allContacts = getAll.result;
+    if (!allContacts.length) return;
 
-    getKeys.onsuccess = () => {
-      const keys = getKeys.result;
-      contacts.forEach((contact, i) => {
-        const formData = new FormData();
-        Object.keys(contact).forEach(k => { if(k !== 'id') formData.append(k, contact[k]); });
+    allContacts.forEach((contact, index) => {
+      const formData = new FormData();
+      for (let key in contact) formData.append(key, contact[key]);
 
-        fetch(scriptURL, { method: 'POST', body: formData })
-          .then(() => {
-            store.delete(keys[i]);
-            if (i === contacts.length - 1) showNotification(`✅ ${contacts.length} offline contact(s) synced!`);
-          })
-          .catch(err => {
-            console.error('Failed to sync contact:', err);
-            showNotification('⚠️ Some contacts could not be synced', 'error');
-          });
-      });
-    };
+      fetch(SCRIPT_URL, { method: 'POST', body: formData })
+        .then(res => {
+          if (res.ok) store.delete(index + 1);
+        })
+        .catch(err => console.error('Failed to send offline contact:', err));
+    });
   };
 }
 
-// 6️⃣ Online/offline events
-window.addEventListener('online', () => {
-  hideOfflineBanner();
-  sendPendingContacts();
-});
+// -------------------
+// Listen Online Event
+// -------------------
+window.addEventListener('online', sendPendingContacts);
 
-window.addEventListener('offline', () => {
-  showOfflineBanner();
-});
-
-// 7️⃣ Hook form submission
+// -------------------
+// Hook Form Submission
+// -------------------
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('contactForm');
   const submitBtn = document.getElementById('submitBtn');
   const confirmCheckbox = document.getElementById('confirmDataCheckbox');
+
   if (!form) return;
 
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', e => {
     e.preventDefault();
     submitBtn.disabled = true;
     submitBtn.innerHTML = '⏳ Submitting...';
 
     const formData = new FormData(form);
     const dataObj = {};
-    formData.forEach((v, k) => dataObj[k] = v);
+    formData.forEach((value, key) => dataObj[key] = value);
 
     if (!navigator.onLine) {
       saveOffline(dataObj);
       form.reset();
       confirmCheckbox.checked = false;
+      submitBtn.disabled = true;
       submitBtn.innerHTML = '✅ Submit';
       return;
     }
 
-    fetch(scriptURL, { method: 'POST', body: formData })
+    // Online submission
+    fetch(SCRIPT_URL, { method: 'POST', body: formData })
       .then(res => {
         if (!res.ok) throw new Error('Submission failed');
         showNotification('✅ Contact submitted successfully!');
         form.reset();
         confirmCheckbox.checked = false;
+        submitBtn.disabled = true;
         submitBtn.innerHTML = '✅ Submit';
         sendPendingContacts();
       })
@@ -140,6 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
         saveOffline(dataObj);
         form.reset();
         confirmCheckbox.checked = false;
+        submitBtn.disabled = true;
         submitBtn.innerHTML = '✅ Submit';
       });
   });
