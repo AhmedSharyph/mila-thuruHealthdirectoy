@@ -55,6 +55,26 @@
   
   </div>
 </nav>
+
+  <script>
+  // Get current page path
+  const currentPath = window.location.pathname;
+
+  // Select the links
+  const homeLink = document.querySelector('a[href="https://ahmedsharyph.github.io/shaviyanihealthdirectory/"]');
+  const addContactLink = document.querySelector('a[href="add-contact.html"]');
+
+  // Hide Home if on homepage
+  if (currentPath === '/' || currentPath.endsWith('index.html')) {
+    if (homeLink) homeLink.style.display = 'none';
+  }
+
+  // Hide Add Contact if on add-contact.html
+  if (currentPath.endsWith('add-contact.html')) {
+    if (addContactLink) addContactLink.style.display = 'none';
+  }
+</script>
+
 </header>
  <!-- Navbar -->
 
