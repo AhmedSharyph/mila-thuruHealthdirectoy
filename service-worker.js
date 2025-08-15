@@ -1,4 +1,4 @@
-const CACHE_NAME = "shaviyanihealthdirectory-cache-v6.3";
+const CACHE_NAME = "shaviyanihealthdirectory-cache-v6.4";
 const urlsToCache = [
   "/shaviyanihealthdirectory/",
   "/shaviyanihealthdirectory/index.html",
@@ -51,7 +51,6 @@ self.addEventListener("fetch", event => {
       if (cachedResponse) return cachedResponse;
 
       return fetch(event.request).catch(() => {
-        // Offline fallback for navigations
         if (event.request.mode === 'navigate') {
           return caches.match('/shaviyanihealthdirectory/index.html');
         }
@@ -61,7 +60,7 @@ self.addEventListener("fetch", event => {
 });
 
 // -------------------
-// Background Sync Event
+// Background Sync
 // -------------------
 self.addEventListener('sync', event => {
   if (event.tag === 'sync-offline-contacts') {
@@ -79,32 +78,37 @@ async function sendOfflineContacts() {
 
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, 1);
+
     request.onsuccess = event => {
       const db = event.target.result;
       const tx = db.transaction(STORE_NAME, 'readwrite');
       const store = tx.objectStore(STORE_NAME);
-      const getAll = store.getAll();
+      const getAll = store.getAllKeys();
 
       getAll.onsuccess = async () => {
-        const contacts = getAll.result;
-        if (!contacts.length) return resolve();
+        const keys = getAll.result;
+        if (!keys.length) return resolve();
 
-        for (let i = 0; i < contacts.length; i++) {
-          const contact = contacts[i];
-          const formData = new FormData();
-          for (let key in contact) formData.append(key, contact[key]);
+        for (let key of keys) {
+          const getReq = store.get(key);
+          getReq.onsuccess = async () => {
+            const contact = getReq.result;
+            const formData = new FormData();
+            for (let field in contact) formData.append(field, contact[field]);
 
-          try {
-            const res = await fetch(SCRIPT_URL, { method: 'POST', body: formData });
-            if (res.ok) store.delete(i + 1);
-          } catch (err) {
-            console.error('Background sync failed for contact:', contact, err);
-          }
+            try {
+              const res = await fetch(SCRIPT_URL, { method: 'POST', body: formData });
+              if (res.ok) store.delete(key); // delete by actual key
+            } catch (err) {
+              console.error('Background sync failed for contact:', contact, err);
+            }
+          };
         }
         resolve();
       };
       getAll.onerror = () => reject(getAll.error);
     };
+
     request.onerror = () => reject(request.error);
   });
 }
