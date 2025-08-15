@@ -279,23 +279,38 @@ window.onload = loadData;
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAOVYRIgupAurZup5y1PRh8Ismb1A3lLao&callback=initMap">
   </script>
   <script src="https://ahmedsharyph.github.io/shaviyanihealthdirectory/install.js" defer></script>
+
+  <!-- hide -->
 <script>
   const currentPath = window.location.pathname;
-  const navbarLinks = document.querySelectorAll('#navbarNav a');
 
+  // Automatically hide any navbar link pointing to the current page
+  const navbarLinks = document.querySelectorAll('#navbarNav a');
   navbarLinks.forEach(link => {
     const href = link.getAttribute('href');
 
-    if ((href === 'https://ahmedsharyph.github.io/shaviyanihealthdirectory/' || href === 'index.html') &&
-        (currentPath === '/shaviyanihealthdirectory/' || currentPath.endsWith('index.html'))) {
-      link.style.display = 'none';
+    // Compare the href with current path
+    // For absolute URLs, convert them to path only
+    let hrefPath;
+    try {
+      hrefPath = new URL(href, window.location.origin).pathname;
+    } catch {
+      hrefPath = href; // fallback for relative paths
     }
 
-    if (href === 'add-contact.html' && currentPath.endsWith('add-contact.html')) {
+    if (hrefPath === currentPath || (hrefPath.endsWith('index.html') && currentPath.endsWith('index.html'))) {
       link.style.display = 'none';
     }
   });
+
+  // Example: hide search form on specific pages
+  const searchForm = document.getElementById('searchForm');
+  const pagesToHideSearch = ['/shaviyanihealthdirectory/add-contact.html']; // add more paths if needed
+  if (searchForm && pagesToHideSearch.includes(currentPath)) {
+    searchForm.style.display = 'none';
+  }
 </script>
+
 
 </body>
 </html>
