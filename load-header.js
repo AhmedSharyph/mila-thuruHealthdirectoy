@@ -33,3 +33,15 @@ document.addEventListener('DOMContentLoaded', () => {
     addContactLink.style.display = 'none';
   }
 });
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const currentPath = window.location.pathname;
+  const searchForm = document.getElementById('searchForm');
+
+  if (searchForm && currentPath.endsWith('add-contact.html')) {
+    searchForm.style.display = 'none';
+  }
+});
+</script>
