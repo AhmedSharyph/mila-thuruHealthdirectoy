@@ -23,32 +23,7 @@
   </style>
 </head>
 <body class="bg-gray-100 text-gray-800 pt-[56px]">
-<header>
-    <!-- Navbar -->
-  <nav class="fixed top-0 left-0 right-0 bg-white shadow z-50">
-    <div class="flex items-center gap-4 px-2 md:px-4 py-2 w-full">
-      <a href="index.html" class="flex items-center whitespace-nowrap">
-        <img src="./logo.png" alt="Logo" class="w-7 h-7 mr-2" />
-        <span class="font-semibold text-emerald-900">Shaviyani Health Directory</span>
-      </a>
-
-      <button id="hamburgerBtn" class="text-xl lg:hidden ml-auto" aria-label="Toggle navigation" aria-expanded="false" aria-controls="navbarNav">
-        &#9776;
-      </button>
-
-      <div id="navbarNav" class="absolute lg:static top-full right-0 bg-white shadow-lg rounded hidden lg:flex flex-col lg:flex-row lg:shadow-none lg:bg-transparent ml-auto">
-        <ul class="flex flex-col lg:flex-row items-end lg:items-center">
-          <li>
-            <a href="index.html" class="block px-4 py-2 text-sm font-medium hover:text-emerald-700">Home</a>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </nav>
-  
-</header>
-
-
+<div id="header-placeholder"></div>
   <!-- Main Content -->
   <main class="max-w-3xl mx-auto py-6 px-4">
     <div class="bg-white rounded-xl shadow">
@@ -221,35 +196,6 @@
     });
   </script>
 <!-- hide -->
-<script>
-  const currentPath = window.location.pathname;
-
-  // Automatically hide any navbar link pointing to the current page
-  const navbarLinks = document.querySelectorAll('#navbarNav a');
-  navbarLinks.forEach(link => {
-    const href = link.getAttribute('href');
-
-    // Compare the href with current path
-    // For absolute URLs, convert them to path only
-    let hrefPath;
-    try {
-      hrefPath = new URL(href, window.location.origin).pathname;
-    } catch {
-      hrefPath = href; // fallback for relative paths
-    }
-
-    if (hrefPath === currentPath || (hrefPath.endsWith('index.html') && currentPath.endsWith('index.html'))) {
-      link.style.display = 'none';
-    }
-  });
-
-  // Example: hide search form on specific pages
-  const searchForm = document.getElementById('searchForm');
-  const pagesToHideSearch = ['/shaviyanihealthdirectory/add-contact.html']; // add more paths if needed
-  if (searchForm && pagesToHideSearch.includes(currentPath)) {
-    searchForm.style.display = 'none';
-  }
-</script>
-
+<script src="load-header.js"></script>
 </body>
 </html>
