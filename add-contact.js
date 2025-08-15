@@ -29,9 +29,9 @@ document.addEventListener('DOMContentLoaded', () => {
   request.onerror = e => console.error('IndexedDB error:', e.target.errorCode);
 
   // -------------------
-  // Floating notification
+  // Floating notifications
   // -------------------
-  function showNotification(msg, type = 'success', duration = 4000) {
+  const showNotification = (msg, type = 'success', duration = 4000) => {
     const box = document.createElement('div');
     box.className = `
       fixed top-5 left-1/2 -translate-x-1/2 px-4 py-2 rounded-xl shadow-lg z-50
@@ -41,23 +41,24 @@ document.addEventListener('DOMContentLoaded', () => {
     box.textContent = msg;
     document.body.appendChild(box);
     setTimeout(() => box.remove(), duration);
-  }
+  };
 
   // -------------------
-  // Initialize Tom Select
+  // Initialize dropdowns
   // -------------------
   new TomSelect(healthCenterSelect, { create: false, placeholder: "Select a Health Center", maxItems: 1 });
+
   fetch(WEB_APP_URL + "?action=getDropdownData")
     .then(res => res.json())
     .then(data => {
-      function populateSelect(select, options, placeholder) {
+      const populateSelect = (select, options, placeholder) => {
         select.innerHTML = '';
         const defaultOption = new Option(placeholder, "", true, true);
         defaultOption.disabled = true;
         select.add(defaultOption);
         options.sort().forEach(v => select.add(new Option(v, v)));
         new TomSelect(select, { create: true, placeholder, maxItems: 1 });
-      }
+      };
       populateSelect(departmentSelect, data.departments, "Select a Department");
       populateSelect(roleSelect, data.roles, "Select a Role or Function");
     })
@@ -71,25 +72,25 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // -------------------
-  // Save offline contact
+  // Save contact offline
   // -------------------
-  function saveOffline(data) {
+  const saveOffline = data => {
     if (!db) return;
     const tx = db.transaction('contacts', 'readwrite');
     tx.objectStore('contacts').add(data);
     showNotification('📥 Offline: Contact saved locally.', 'success');
 
-    // Register background sync if available
     if ('serviceWorker' in navigator && 'SyncManager' in window) {
       navigator.serviceWorker.ready.then(reg => reg.sync.register('sync-offline-contacts'));
     }
-  }
+  };
 
   // -------------------
   // Send pending contacts
   // -------------------
-  function sendPendingContacts() {
+  const sendPendingContacts = () => {
     if (!navigator.onLine || !db) return;
+
     const tx = db.transaction('contacts', 'readwrite');
     const store = tx.objectStore('contacts');
     const getAll = store.getAll();
@@ -107,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
           .catch(err => console.error('Offline sync failed:', err));
       });
     };
-  }
+  };
 
   // -------------------
   // Form submit
