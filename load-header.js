@@ -1,6 +1,4 @@
-// load-header.js
-
-// Load header dynamically
+// load-header.js (after inserting header)
 fetch('header.html')
   .then(response => response.text())
   .then(data => {
@@ -28,6 +26,18 @@ fetch('header.html')
     const pagesToHideSearch = ['/shaviyanihealthdirectory/add-contact.html'];
     if (searchForm && pagesToHideSearch.includes(currentPath)) {
       searchForm.style.display = 'none';
+    }
+
+    // --- Hamburger menu toggle ---
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+    const navbarNav = document.getElementById('navbarNav');
+
+    if (hamburgerBtn && navbarNav) {
+      hamburgerBtn.addEventListener('click', () => {
+        const expanded = hamburgerBtn.getAttribute('aria-expanded') === 'true';
+        hamburgerBtn.setAttribute('aria-expanded', !expanded);
+        navbarNav.classList.toggle('hidden');
+      });
     }
   })
   .catch(err => console.error('Error loading header:', err));
