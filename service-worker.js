@@ -1,4 +1,4 @@
-const CACHE_NAME = "shaviyanihealthdirectory-cache-v6.4";
+const CACHE_NAME = "shaviyanihealthdirectory-cache-v7.0";
 const urlsToCache = [
   "/shaviyanihealthdirectory/",
   "/shaviyanihealthdirectory/index.html",
@@ -60,55 +60,80 @@ self.addEventListener("fetch", event => {
 });
 
 // -------------------
+// IndexedDB Helper
+// -------------------
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open("offlineContactsDB", 1);
+    request.onupgradeneeded = e => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains("contacts")) {
+        db.createObjectStore("contacts", { autoIncrement: true });
+      }
+    };
+    request.onsuccess = e => resolve(e.target.result);
+    request.onerror = e => reject(e.target.error);
+  });
+}
+
+// -------------------
+// Save offline contact
+// -------------------
+async function saveOffline(contact) {
+  const db = await openDB();
+  const tx = db.transaction("contacts", "readwrite");
+  const store = tx.objectStore("contacts");
+  store.add(contact);
+  return tx.complete;
+}
+
+// -------------------
 // Background Sync
 // -------------------
-self.addEventListener('sync', event => {
-  if (event.tag === 'sync-offline-contacts') {
-    event.waitUntil(sendOfflineContacts());
+self.addEventListener("sync", event => {
+  if (event.tag === "sync-offline-contacts") {
+    event.waitUntil(syncOfflineContacts());
   }
 });
 
-// -------------------
-// Helper: Send Offline Contacts
-// -------------------
-async function sendOfflineContacts() {
-  const DB_NAME = 'offlineContactsDB';
-  const STORE_NAME = 'contacts';
+async function syncOfflineContacts() {
   const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzL2KKwec0TU0r-WpsrVoSZykstA1v8Am4fvlQN6J-W8manlp32_JWG0UH41OsbQe3ZAA/exec';
+  const db = await openDB();
+  const tx = db.transaction("contacts", "readwrite");
+  const store = tx.objectStore("contacts");
+  const allContacts = await new Promise(resolve => {
+    const getAll = store.getAll();
+    getAll.onsuccess = () => resolve(getAll.result);
+  });
 
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, 1);
+  for (let i = 0; i < allContacts.length; i++) {
+    const contact = allContacts[i];
+    const formData = new FormData();
+    for (const key in contact) formData.append(key, contact[key]);
+    try {
+      const res = await fetch(SCRIPT_URL, { method: "POST", body: formData });
+      if (res.ok) store.delete(i + 1);
+    } catch (err) {
+      console.error("Failed to sync contact:", contact, err);
+    }
+  }
 
-    request.onsuccess = event => {
-      const db = event.target.result;
-      const tx = db.transaction(STORE_NAME, 'readwrite');
-      const store = tx.objectStore(STORE_NAME);
-      const getAll = store.getAllKeys();
-
-      getAll.onsuccess = async () => {
-        const keys = getAll.result;
-        if (!keys.length) return resolve();
-
-        for (let key of keys) {
-          const getReq = store.get(key);
-          getReq.onsuccess = async () => {
-            const contact = getReq.result;
-            const formData = new FormData();
-            for (let field in contact) formData.append(field, contact[field]);
-
-            try {
-              const res = await fetch(SCRIPT_URL, { method: 'POST', body: formData });
-              if (res.ok) store.delete(key); // delete by actual key
-            } catch (err) {
-              console.error('Background sync failed for contact:', contact, err);
-            }
-          };
-        }
-        resolve();
-      };
-      getAll.onerror = () => reject(getAll.error);
-    };
-
-    request.onerror = () => reject(request.error);
+  // Notify all clients
+  self.clients.matchAll().then(clients => {
+    clients.forEach(client => client.postMessage({ type: "sync-complete" }));
   });
 }
+
+// -------------------
+// Receive messages from page (for offline save)
+// -------------------
+self.addEventListener("message", async event => {
+  const { type, contact } = event.data;
+  if (type === "save-offline") {
+    await saveOffline(contact);
+    // Optionally register background sync
+    if ("sync" in self.registration) {
+      self.registration.sync.register("sync-offline-contacts");
+    }
+  }
+});
