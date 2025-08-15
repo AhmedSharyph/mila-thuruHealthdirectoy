@@ -24,7 +24,7 @@ self.addEventListener("install", event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => cache.addAll(urlsToCache))
-      .then(() => self.skipWaiting()) // Activate immediately
+      .then(() => self.skipWaiting()) // Activate immediately after install
   );
 });
 
@@ -33,12 +33,12 @@ self.addEventListener("install", event => {
 // -------------------
 self.addEventListener("activate", event => {
   event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(
+    caches.keys()
+      .then(keys => Promise.all(
         keys.filter(key => key !== CACHE_NAME)
             .map(key => caches.delete(key))
-      )
-    ).then(() => self.clients.claim())
+      ))
+      .then(() => self.clients.claim())
   );
 });
 
@@ -47,17 +47,18 @@ self.addEventListener("activate", event => {
 // -------------------
 self.addEventListener("fetch", event => {
   event.respondWith(
-    caches.match(event.request).then(cachedResponse => {
-      // Serve cached version if available
-      if (cachedResponse) return cachedResponse;
+    caches.match(event.request)
+      .then(cachedResponse => {
+        // Return cached version if available
+        if (cachedResponse) return cachedResponse;
 
-      // Otherwise fetch from network
-      return fetch(event.request).catch(() => {
-        // Offline fallback for navigations (HTML pages)
-        if (event.request.mode === 'navigate') {
-          return caches.match('/shaviyanihealthdirectory/index.html');
-        }
-      });
-    })
+        // Otherwise fetch from network
+        return fetch(event.request).catch(() => {
+          // Offline fallback for navigations (HTML pages)
+          if (event.request.mode === 'navigate') {
+            return caches.match('/shaviyanihealthdirectory/index.html');
+          }
+        });
+      })
   );
 });
