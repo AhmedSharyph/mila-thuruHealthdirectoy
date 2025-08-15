@@ -43,3 +43,13 @@ document.addEventListener('DOMContentLoaded', () => {
     searchForm.style.display = 'none';
   }
 });
+
+const hamburgerBtn = document.getElementById('hamburgerBtn');
+const navbarNav = document.getElementById('navbarNav');
+if (hamburgerBtn && navbarNav) {
+  hamburgerBtn.addEventListener('click', () => {
+    const expanded = hamburgerBtn.getAttribute('aria-expanded') === 'true';
+    hamburgerBtn.setAttribute('aria-expanded', !expanded);
+    navbarNav.classList.toggle('hidden');
+  });
+}
