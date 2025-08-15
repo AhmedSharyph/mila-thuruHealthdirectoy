@@ -1,4 +1,5 @@
-// load-header.js (after inserting header)
+// load-header.js
+
 fetch('header.html')
   .then(response => response.text())
   .then(data => {
@@ -28,7 +29,7 @@ fetch('header.html')
       searchForm.style.display = 'none';
     }
 
-    // --- Hamburger menu toggle ---
+    // Hamburger menu toggle for mobile
     const hamburgerBtn = document.getElementById('hamburgerBtn');
     const navbarNav = document.getElementById('navbarNav');
 
