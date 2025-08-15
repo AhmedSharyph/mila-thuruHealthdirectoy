@@ -4,14 +4,14 @@
   <meta charset="UTF-8" />
   <title>Shaviyani Health Directory - Add Contact</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  
+
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
-  
+
   <!-- Tom Select CSS -->
   <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet" />
-  
+
   <style>
     body {
       font-family: 'Roboto', sans-serif;
@@ -23,57 +23,33 @@
   </style>
 </head>
 <body class="bg-gray-100 text-gray-800 pt-[56px]">
-<!-- Navbar -->
-<nav class="fixed top-0 left-0 right-0 bg-[#00bcd4] shadow z-50">
-  <div class="max-w-7xl mx-auto flex items-center justify-between px-4 py-3">
 
-    <!-- Logo + Title -->
-    <a href="index.html" class="flex items-center gap-2">
-      <img src="./logo.png" alt="Logo" class="w-8 h-8">
-      <span class="hidden lg:inline font-semibold text-emerald-900">Shaviyani Health Directory</span>
-    </a>
+  <!-- Navbar -->
+  <nav class="fixed top-0 left-0 right-0 bg-white shadow z-50">
+    <div class="flex items-center gap-4 px-2 md:px-4 py-2 w-full">
+      <a href="index.html" class="flex items-center whitespace-nowrap">
+        <img src="./logo.png" alt="Logo" class="w-7 h-7 mr-2" />
+        <span class="font-semibold text-emerald-900">Shaviyani Health Directory</span>
+      </a>
 
-    <!-- Search Form (visible on all screens) -->
-    <!--<form id="searchForm" class="flex flex-grow mx-2 md:mx-4" role="search" onsubmit="return false;">
-      <input
-        id="searchInput"
-        type="search"
-        placeholder="🔍 Search by any field..."
-        autocomplete="off"
-        aria-label="Search directory"
-        class="w-full border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600"
-      />
-    </form>-->
+      <button id="hamburgerBtn" class="text-xl lg:hidden ml-auto" aria-label="Toggle navigation" aria-expanded="false" aria-controls="navbarNav">
+        &#9776;
+      </button>
 
-    <!-- Hamburger (mobile) -->
-    <button id="hamburgerBtn" class="text-2xl lg:hidden" aria-label="Toggle navigation" aria-expanded="false">
-      &#9776;
-    </button>
-
-    <!-- Navigation Links -->
-    <div id="navbarNav" class="hidden lg:flex lg:items-center lg:space-x-4">
-<a href="https://ahmedsharyph.github.io/shaviyanihealthdirectory/" class="block px-4 py-2 text-sm font-medium hover:text-emerald-700">Home</a>
+      <div id="navbarNav" class="absolute lg:static top-full right-0 bg-white shadow-lg rounded hidden lg:flex flex-col lg:flex-row lg:shadow-none lg:bg-transparent ml-auto">
+        <ul class="flex flex-col lg:flex-row items-end lg:items-center">
+          <li>
+            <a href="index.html" class="block px-4 py-2 text-sm font-medium hover:text-emerald-700">Home</a>
+          </li>
+        </ul>
+      </div>
     </div>
-
-  </div>
-</nav>
-
-<!-- Hamburger Script -->
-<script>
-  const hamburgerBtn = document.getElementById('hamburgerBtn');
-  const navbarNav = document.getElementById('navbarNav');
-
-  hamburgerBtn.addEventListener('click', () => {
-    const expanded = hamburgerBtn.getAttribute('aria-expanded') === 'true';
-    hamburgerBtn.setAttribute('aria-expanded', !expanded);
-    navbarNav.classList.toggle('hidden');
-  });
-</script>
+  </nav>
 
   <!-- Main Content -->
   <main class="max-w-3xl mx-auto py-6 px-4">
     <div class="bg-white rounded-xl shadow">
-<div class="bg-[#00bcd4] text-white text-center rounded-t-xl px-4 py-3">
+      <div class="bg-emerald-600 text-white text-center rounded-t-xl px-4 py-3">
         <h5 class="m-0 font-semibold">📇 Fill in Contact Details</h5>
       </div>
       <div class="p-6">
@@ -85,7 +61,7 @@
             <select id="healthCenter" name="Health Center" required>
               <option value="" disabled selected>Select a Health Center</option>
               <option value="Shaviyani Atoll Hospital">Shaviyani Atoll Hospital</option>
-              <option value="Kanditheemu Health Center">Kanditheemu Health Center</option>
+              <option value="Kandutheemu Health Center">Kanditheemu Health Center</option>
               <option value="Noomaraa Health Center">Noomaraa Health Center</option>
               <option value="Goidhoo Health Center">Goidhoo Health Center</option>
               <option value="Feydhoo Health Center">Feydhoo Health Center</option>
@@ -116,13 +92,13 @@
           <!-- Assigned Staff -->
           <div>
             <label for="assignedTo" class="block mb-1 font-medium">Assigned Staff Name</label>
-            <input type="text" id="assignedTo" name="Assigned To" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-600" />
+            <input type="text" id="assignedTo" name="Role or Function" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-600" />
           </div>
 
           <!-- Role -->
           <div>
             <label for="role" class="block mb-1 font-medium">Role or Function</label>
-            <select id="role" name="Role or Function" required></select>
+            <select id="role" name="Assigned To" required></select>
           </div>
 
           <!-- Confirmation -->
@@ -133,11 +109,10 @@
 
           <!-- Submit -->
           <div>
-            <button type="submit" id="submitBtn" disabled class="w-full bg-[#00bcd4] text-white px-4 py-2 rounded-lg hover:bg-emerald-700 disabled:opacity-60 flex items-center justify-center gap-2">
+            <button type="submit" id="submitBtn" disabled class="w-full bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 disabled:opacity-60 flex items-center justify-center gap-2">
               ✅ Submit
             </button>
           </div>
-
         </form>
       </div>
     </div>
@@ -147,8 +122,8 @@
   <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwndImcPMsQCTx1xLtxolE7Q7nOdN_nVpmOh7fw0U0Sy0-0u30Chp6ovUVhJgk2XdRuNg/exec";
+    document.addEventListener('DOMContentLoaded', function () {
+      const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxI_5lWR-Bvk-FfqFgM2yp_tCgbGcUqxQY1kgPgAMb-7FdpyFTlfp3cvkBNoW2uTou77w/exec";
 
       const healthCenterSelect = document.getElementById('healthCenter');
       const departmentSelect = document.getElementById('department');
@@ -158,55 +133,81 @@
       const form = document.getElementById('contactForm');
 
       // Initialize Tom Select
-      [healthCenterSelect, departmentSelect, roleSelect].forEach(select => {
-        new TomSelect(select, { create: false, maxItems: 1 });
+      new TomSelect(healthCenterSelect, {
+        create: false,
+        placeholder: "Select a Health Center",
+        maxItems: 1,
+        sortField: false,
       });
 
-      // Populate department and role
+      // Populate dropdowns
       fetch(WEB_APP_URL + "?action=getDropdownData")
-        .then(res => res.json())
+        .then(response => response.json())
         .then(data => {
-          const populate = (select, options, placeholder) => {
-            select.innerHTML = `<option value="" disabled selected>${placeholder}</option>`;
-            options.sort().forEach(opt => select.add(new Option(opt, opt)));
-          };
-          populate(departmentSelect, data.departments, "Select a Department");
-          populate(roleSelect, data.roles, "Select a Role or Function");
-        })
-        .catch(err => { console.error(err); alert('Failed to load dropdown data.'); });
+          function populateSelect(selectElem, options, placeholderText, allowCreate = true, sort = true) {
+            selectElem.innerHTML = '';
+            const defaultOption = new Option(placeholderText, "", true, true);
+            defaultOption.disabled = true;
+            selectElem.add(defaultOption);
 
-      // Enable submit button on confirm
+            if (sort) options.sort();
+
+            options.forEach(value => {
+              selectElem.add(new Option(value, value));
+            });
+
+            new TomSelect(selectElem, {
+              create: allowCreate,
+              placeholder: placeholderText,
+              maxItems: 1,
+              sortField: sort ? "text" : undefined,
+            });
+          }
+
+          populateSelect(departmentSelect, data.departments, "Select a Department");
+          populateSelect(roleSelect, data.roles, "Select a Role or Function");
+        })
+        .catch(err => {
+          console.error(err);
+          alert('Failed to load dropdown data. Please refresh the page.');
+        });
+
+      // Enable submit on confirm
       confirmDataCheckbox.addEventListener('change', () => {
         submitBtn.disabled = !confirmDataCheckbox.checked;
       });
 
       // Form submission
+      const scriptURL = 'https://script.google.com/macros/s/AKfycbzL2KKwec0TU0r-WpsrVoSZykstA1v8Am4fvlQN6J-W8manlp32_JWG0UH41OsbQe3ZAA/exec';
       form.addEventListener('submit', e => {
         e.preventDefault();
         submitBtn.disabled = true;
-        submitBtn.textContent = '⏳ Submitting...';
+        submitBtn.innerHTML = '⏳ Submitting...';
+
         const formData = new FormData(form);
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbzL2KKwec0TU0r-WpsrVoSZykstA1v8Am4fvlQN6J-W8manlp32_JWG0UH41OsbQe3ZAA/exec';
 
         fetch(scriptURL, { method: 'POST', body: formData })
-          .then(res => {
-            if (!res.ok) throw new Error('Submission failed');
+          .then(response => {
+            if (!response.ok) throw new Error('Submission failed');
+            return response;
+          })
+          .then(() => {
             alert('Contact details submitted successfully!');
             form.reset();
             confirmDataCheckbox.checked = false;
             submitBtn.disabled = true;
-            submitBtn.textContent = '✅ Submit';
-            setTimeout(() => window.location.reload(), 1500);
+            submitBtn.innerHTML = '✅ Submit';
+            setTimeout(() => window.location.reload(), 2000);
           })
-          .catch(err => {
-            console.error(err);
+          .catch(error => {
+            console.error('Error!', error.message);
             alert('Error submitting data. Please try again.');
             submitBtn.disabled = false;
-            submitBtn.textContent = '✅ Submit';
+            submitBtn.innerHTML = '✅ Submit';
           });
       });
 
-      // Hamburger toggle
+      // Hamburger menu toggle
       const hamburgerBtn = document.getElementById('hamburgerBtn');
       const navbarNav = document.getElementById('navbarNav');
       hamburgerBtn.addEventListener('click', () => {
@@ -215,21 +216,6 @@
         navbarNav.classList.toggle('hidden');
       });
     });
-  </script>
-
-  <!-- Footer -->
-  <footer class="bg-white shadow-inner mt-8 py-4 text-center text-sm text-gray-600">
-    <p>
-      &copy; <span id="footerYear"></span> Shaviyani Health Directory. 
-      Developed by 
-      <a href="https://www.ahmedshareef.mv/" target="_blank" rel="noopener noreferrer" class="text-emerald-600 hover:underline">AhmedSharyph</a>.
-    </p>
-  </footer>
-
-  <script>
-    // Dynamic year starting from 2025
-    const currentYear = new Date().getFullYear();
-    document.getElementById('footerYear').textContent = currentYear > 2025 ? `2025 - ${currentYear}` : '2025';
   </script>
 
 </body>
