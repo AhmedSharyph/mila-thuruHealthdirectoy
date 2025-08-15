@@ -17,7 +17,7 @@ fetch('header.html')
       } catch {
         hrefPath = link.getAttribute('href');
       }
-      if (hrefPath === currentPath || (hrefPath.endsWith('./') && currentPath.endsWith('index.html'))) {
+      if (hrefPath === currentPath || (hrefPath.endsWith('index.html') && currentPath.endsWith('index.html'))) {
         link.style.display = 'none';
       }
     });
