@@ -13,8 +13,12 @@ fetch('header.html')
         hrefPath = link.getAttribute('href');
       }
 
-      if (hrefPath === currentPath || 
-          (hrefPath.endsWith('index.html') && (currentPath.endsWith('/') || currentPath.endsWith('index.html')))) {
+      // Treat both /shaviyanihealthdirectory/ and index.html as homepage
+      const isHomeLink = hrefPath === './' || hrefPath.endsWith('index.html');
+      const isHomePage = currentPath === '/shaviyanihealthdirectory/' || currentPath.endsWith('index.html');
+
+      if ((isHomeLink && isHomePage) || 
+          (hrefPath === 'add-contact.html' && currentPath.endsWith('add-contact.html'))) {
         link.style.display = 'none';
       }
     });
