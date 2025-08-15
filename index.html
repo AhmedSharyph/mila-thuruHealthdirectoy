@@ -56,24 +56,6 @@
   </div>
 </nav>
 
-  <script>
-  // Get current page path
-  const currentPath = window.location.pathname;
-
-  // Select the links
-  const homeLink = document.querySelector('a[href="https://ahmedsharyph.github.io/shaviyanihealthdirectory/"]');
-  const addContactLink = document.querySelector('a[href="add-contact.html"]');
-
-  // Hide Home if on homepage
-  if (currentPath === '/' || currentPath.endsWith('index.html')) {
-    if (homeLink) homeLink.style.display = 'none';
-  }
-
-  // Hide Add Contact if on add-contact.html
-  if (currentPath.endsWith('add-contact.html')) {
-    if (addContactLink) addContactLink.style.display = 'none';
-  }
-</script>
 
 </header>
  <!-- Navbar -->
@@ -297,6 +279,23 @@ window.onload = loadData;
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAOVYRIgupAurZup5y1PRh8Ismb1A3lLao&callback=initMap">
   </script>
   <script src="https://ahmedsharyph.github.io/shaviyanihealthdirectory/install.js" defer></script>
+<script>
+  const currentPath = window.location.pathname;
+  const navbarLinks = document.querySelectorAll('#navbarNav a');
+
+  navbarLinks.forEach(link => {
+    const href = link.getAttribute('href');
+
+    if ((href === 'https://ahmedsharyph.github.io/shaviyanihealthdirectory/' || href === 'index.html') &&
+        (currentPath === '/shaviyanihealthdirectory/' || currentPath.endsWith('index.html'))) {
+      link.style.display = 'none';
+    }
+
+    if (href === 'add-contact.html' && currentPath.endsWith('add-contact.html')) {
+      link.style.display = 'none';
+    }
+  });
+</script>
 
 </body>
 </html>
