@@ -1,11 +1,21 @@
 const CACHE_NAME = "shaviyanihealthdirectory-cache-v5.6";
 const urlsToCache = [
+const CACHE_NAME = "shaviyanihealthdirectory-cache-v6.0";
+const urlsToCache = [
   "/shaviyanihealthdirectory/",
   "/shaviyanihealthdirectory/index.html",
+  "/shaviyanihealthdirectory/add-contact.html",
+  "/shaviyanihealthdirectory/header.html",
   "/shaviyanihealthdirectory/app.js",
+  "/shaviyanihealthdirectory/add-contact.js",
+  "/shaviyanihealthdirectory/load-header.js",
   "/shaviyanihealthdirectory/install.js",
   "/shaviyanihealthdirectory/ft_logo.png",
-  "/shaviyanihealthdirectory/manifest.json"
+  "/shaviyanihealthdirectory/logo.png",
+  "/shaviyanihealthdirectory/manifest.json",
+  "/shaviyanihealthdirectory/tailwind.js",
+  "/shaviyanihealthdirectory/tom-select.js",
+  "/shaviyanihealthdirectory/tom-select.css"
   // Note: No style.css since Tailwind is loaded via CDN
 ];
 
